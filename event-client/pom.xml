@@ -13,13 +13,6 @@
     <version>1.0.0</version>
 
     <dependencies>
-
-        <dependency>
-            <groupId>com.ypsx</groupId>
-            <artifactId>util-client</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
