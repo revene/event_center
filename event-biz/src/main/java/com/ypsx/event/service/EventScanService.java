@@ -1,8 +1,8 @@
 package com.ypsx.event.service;
 
+import com.ypsx.event.model.Result;
 import com.ypsx.event.model.Event;
 import com.ypsx.event.model.EventScanNode;
-import com.ypsx.util.model.Result;
 
 /**
  * 功能：事件扫描服务
@@ -35,7 +35,7 @@ public interface EventScanService {
      *
      * @return
      */
-    Result<Boolean> stop();
+    Result stop();
 
     /**
      * 功能：将事件提交到时间轮

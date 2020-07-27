@@ -1,7 +1,6 @@
-package com.ypsx.event;
+package com.ypsx.event.model;
 
-import lombok.Data;
-import lombok.ToString;
+
 
 /**
  * 返回的结果包装类
@@ -9,8 +8,6 @@ import lombok.ToString;
  * @author ：blanc
  * @date ：Created in 2020/7/27 下午5:34
  */
-@Data
-@ToString
 public class Result<T> {
 
     /**

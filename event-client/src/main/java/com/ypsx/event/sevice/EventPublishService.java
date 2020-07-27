@@ -2,12 +2,14 @@ package com.ypsx.event.sevice;
 
 import com.ypsx.event.model.Event;
 import com.ypsx.event.model.EventResult;
-import com.ypsx.util.model.Result;
+import com.ypsx.event.model.Result;
 
 import java.util.List;
 
 /**
- * @author chuchengyi
+ * 事件发布服务
+ *
+ * @author wangbaoliang
  */
 public interface EventPublishService {
 

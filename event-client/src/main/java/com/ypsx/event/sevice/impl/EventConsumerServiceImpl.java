@@ -5,13 +5,8 @@ import com.ypsx.event.model.Event;
 import com.ypsx.event.model.EventResult;
 import com.ypsx.event.sevice.AbstractEventConsumerService;
 import com.ypsx.event.sevice.EventConsumerService;
-import com.ypsx.event.util.IpUtil;
-import com.ypsx.util.model.Result;
 
-import java.net.InetAddress;
 import java.util.Date;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 功能：事件处理服务的实现

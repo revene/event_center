@@ -2,21 +2,18 @@ package com.ypsx.event.service.impl;
 
 import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.ypsx.event.cache.EventExecuteResultCache;
+import com.ypsx.event.model.Result;
 import com.ypsx.event.manager.EventScanManager;
 import com.ypsx.event.manager.EventScanNodeManager;
 import com.ypsx.event.model.Event;
 import com.ypsx.event.model.EventScanNode;
 import com.ypsx.event.service.EventScanService;
-import com.ypsx.event.timer.impl.HashedWheelTimer;
 import com.ypsx.event.timer.Timer;
+import com.ypsx.event.timer.impl.HashedWheelTimer;
 import com.ypsx.event.worker.EventTaskListener;
 import com.ypsx.event.worker.EventTimerTask;
 import com.ypsx.event.worker.ScannerWorker;
-import com.ypsx.util.model.Result;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +21,9 @@ import java.util.Map;
 import java.util.concurrent.*;
 
 /**
- * @author chuchengyi
+ * 时间扫描服务实现类
+ *
+ * @author wangbaoliang
  */
 @Slf4j(topic = "eventLog")
 @Component
@@ -107,7 +106,7 @@ public class EventScanServiceImpl implements EventScanService {
             if (delay < 0) {
                 delay = DEFAULT_DELAY_TIME;
             }
-            task.setData(event);
+            task.setEvent(event);
             //设置事件监听的处理器，其中包括execute方法
             task.setTaskListener(this.eventTaskListener);
             //将事件包装好提交到时间轮
@@ -199,12 +198,10 @@ public class EventScanServiceImpl implements EventScanService {
         Result<Boolean> result = new Result<>();
         try {
             timer.stop();
-            result.setSuccess(true);
-            result.setModel(true);
+            result.success();
         } catch (Throwable throwable) {
-            result.setSuccess(false);
-            result.setErrorMessage(throwable.getMessage());
-            log.error("EventScanServiceImpl[stop] is error:" + throwable.getMessage());
+            result.fail(Throwables.getStackTraceAsString(throwable));
+            log.error("EventScanServiceImpl[stop] is error, caused by {}", Throwables.getStackTraceAsString(throwable));
 
         }
         return result;
