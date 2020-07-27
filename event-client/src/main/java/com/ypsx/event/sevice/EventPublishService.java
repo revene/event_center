@@ -20,7 +20,7 @@ public interface EventPublishService {
      * @param event
      * @return
      */
-    public Result<String> publishEvent(Event event);
+    Result<String> publishEvent(Event event);
 
 
     /**
@@ -29,7 +29,7 @@ public interface EventPublishService {
      * @param event
      * @return
      */
-    public Result<Boolean> cancelEvent(Event event);
+    Result cancelEvent(Event event);
 
 
     /**
@@ -38,7 +38,7 @@ public interface EventPublishService {
      * @param event
      * @return
      */
-    public Result<Boolean> successEvent(Event event);
+    Result successEvent(Event event);
 
 
     /**
@@ -48,7 +48,7 @@ public interface EventPublishService {
      * @param eventResult
      * @return
      */
-    public Result<Boolean> reportEventExecute(Event event, EventResult eventResult);
+    Result reportEventExecute(Event event, EventResult eventResult);
 
 
 }

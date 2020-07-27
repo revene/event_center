@@ -1,28 +1,20 @@
 package com.ypsx.event.manager.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.google.common.base.Throwables;
 import com.ypsx.event.cache.EventTypeCache;
 import com.ypsx.event.dao.EventDao;
 import com.ypsx.event.error.ExceptionConstant;
 import com.ypsx.event.error.ExceptionUtil;
 import com.ypsx.event.manager.EventManager;
-import com.ypsx.event.model.Event;
-import com.ypsx.event.model.EventQuery;
-import com.ypsx.event.model.EventStatus;
-import com.ypsx.event.model.EventType;
-import com.ypsx.event.sharing.IpKeyGenerator;
-import com.ypsx.util.model.ExceptionInfo;
-import com.ypsx.util.model.Result;
-import io.shardingsphere.api.HintManager;
+import com.ypsx.event.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
-import javax.annotation.Resource;
-
-import static com.ypsx.event.util.ParamUtil.isEmpty;
 
 /**
  * 事件服务实现类
@@ -42,29 +34,6 @@ public class EventManagerImpl implements EventManager {
     private final static Logger logger = LoggerFactory.getLogger("eventLog");
 
 
-    /**
-     * 功能：检测参数信息是否正确
-     *
-     * @param event
-     * @return
-     */
-    private ExceptionInfo checkParam(Event event) {
-        //判断应用标识是否为空
-        if (isEmpty(event.getAppCode())) {
-            return ExceptionConstant.APP_CODE_IS_NULL;
-        }
-        //判断事件类型是否为空
-        if (isEmpty(event.getEventType())) {
-            return ExceptionConstant.EVENT_TYPE_IS_NULL;
-        }
-
-        //判断业务标识是否为空
-        if (isEmpty(event.getBizId())) {
-            return ExceptionConstant.BIZ_ID_IS_NULL;
-        }
-
-        return ExceptionConstant.OK;
-    }
 
     @Override
     public Result<String> saveEvent(Event event) {
@@ -72,15 +41,15 @@ public class EventManagerImpl implements EventManager {
         Result<String> result = new Result<String>();
         try {
             //检测输入信息是是否正确
-            ExceptionInfo exceptionCode = checkParam(event);
-            if (exceptionCode != ExceptionConstant.OK) {
-                ExceptionUtil.setException(result, exceptionCode);
-                return result;
-            }
+//            ExceptionInfo exceptionCode = checkParam(event);
+//            if (exceptionCode != ExceptionConstant.OK) {
+//                ExceptionUtil.setException(result, exceptionCode);
+//                return result;
+//            }
             //获取到事件类型
             EventType eventType = EventTypeCache.getInstance().getEventType(event);
             if (eventType == null) {
-                result.setSuccess(false);
+                result.fail(ExceptionConstant.EVENT_TYPE_IS_NOT_EXIST.getExceptionMessage());
                 ExceptionUtil.setException(result, ExceptionConstant.EVENT_TYPE_IS_NOT_EXIST);
                 return result;
             }
@@ -89,20 +58,18 @@ public class EventManagerImpl implements EventManager {
             Event exit = isExistEvent(event);
             if (exit != null) {
                 //当已经存在直接返回true
-                result.setSuccess(true);
+                result.success();
                 return result;
             } else {
                 //重置执行的信息
                 setEventInfo(event, eventType);
                 //保存事件信息
                 doSaveEvent(event);
-                result.setSuccess(true);
-                result.setModel(event.getId() + "");
+                result.success(event.getId() + "");
             }
 
         } catch (Throwable throwable) {
-            ExceptionInfo exceptionInfo = ExceptionUtil.genSystemError(throwable);
-            result.setException(exceptionInfo);
+            result.fail(Throwables.getStackTraceAsString(throwable));
             logger.error("EventManagerImpl[saveEvent] is error data=" + JSON.toJSONString(event) + "error:", throwable);
             throwable.printStackTrace();
         }
@@ -130,7 +97,7 @@ public class EventManagerImpl implements EventManager {
             event.setVersion(0L);
         }
         //设置id
-        event.setId(ipKeyGenerator.generateKey().longValue());
+//        event.setId(ipKeyGenerator.generateKey().longValue());
         //获取第一次期望执行的时间
         Long expireTime = System.currentTimeMillis();
         if (eventType.getSchedule() == 0) {
@@ -164,14 +131,14 @@ public class EventManagerImpl implements EventManager {
 
     public Event getEvent(String appCode, String eventType, String bizId, Long version) {
         //必须手动初始化hint
-        HintManager hintManager = null;
+//        HintManager hintManager = null;
         try {
-            hintManager = initHint(EVENT_TABLE, bizId, bizId);
+//            hintManager = initHint(EVENT_TABLE, bizId, bizId);
             return eventDao.getEvent(appCode, eventType, bizId, version);
         } catch (Throwable throwable) {
             throw throwable;
         } finally {
-            closeHint(hintManager);
+//            closeHint(hintManager);
         }
 
     }
@@ -182,37 +149,35 @@ public class EventManagerImpl implements EventManager {
      * @param event
      */
     private void doSaveEvent(Event event) {
-        HintManager hintManager = null;
+//        HintManager hintManager = null;
         try {
             //必须手动初始化hint
             String bizId = event.getBizId();
-            hintManager = initHint(EVENT_TABLE, bizId, bizId);
+//            hintManager = initHint(EVENT_TABLE, bizId, bizId);
             eventDao.insertEvent(event);
         } catch (Throwable throwable) {
             throw throwable;
         } finally {
-            closeHint(hintManager);
+//            closeHint(hintManager);
         }
 
     }
 
 
     @Override
-    public Result<Boolean> updateEvent(Event event) {
-        Result<Boolean> result = new Result<Boolean>();
-        HintManager hintManager = null;
+    public Result updateEvent(Event event) {
+        Result result = new Result();
+//        HintManager hintManager = null;
         try {
             String bizId = event.getBizId();
-            hintManager = initHint(EVENT_TABLE, bizId, bizId);
+//            hintManager = initHint(EVENT_TABLE, bizId, bizId);
             eventDao.updateEvent(event);
-            result.setModel(true);
-            result.setSuccess(true);
+            result.success();
         } catch (Throwable throwable) {
-            ExceptionInfo exceptionInfo = ExceptionUtil.genSystemError(throwable);
-            result.setException(exceptionInfo);
+            result.fail(Throwables.getStackTraceAsString(throwable));
             logger.error("EventManagerImpl[updateEvent] is error data=" + JSON.toJSONString(event) + "error:" + throwable.getMessage());
         } finally {
-            closeHint(hintManager);
+//            closeHint(hintManager);
         }
         return result;
     }
@@ -220,18 +185,16 @@ public class EventManagerImpl implements EventManager {
     @Override
     public Result<List<Event>> listEvent(EventQuery query) {
         Result<List<Event>> result = new Result<>();
-        HintManager hintManager = null;
+//        HintManager hintManager = null;
         try {
-            hintManager = initHint(EVENT_TABLE, query.getBizId(), query.getBizId());
+//            hintManager = initHint(EVENT_TABLE, query.getBizId(), query.getBizId());
             List<Event> dataList = eventDao.listEvent(query);
-            result.setModel(dataList);
-            result.setSuccess(true);
+            result.success(dataList);
         } catch (Throwable throwable) {
-            ExceptionInfo exceptionInfo = ExceptionUtil.genSystemError(throwable);
-            result.setException(exceptionInfo);
+            result.fail(Throwables.getStackTraceAsString(throwable));
             logger.error("EventManagerImpl[updateEvent] is error data=" + JSON.toJSONString(query) + "error:" + throwable.getMessage());
         } finally {
-            closeHint(hintManager);
+//            closeHint(hintManager);
         }
         return result;
     }
@@ -240,18 +203,16 @@ public class EventManagerImpl implements EventManager {
     @Override
     public Result<Integer> countEvent(EventQuery query) {
         Result<Integer> result = new Result<>();
-        HintManager hintManager = null;
+//        HintManager hintManager = null;
         try {
-            hintManager = initHint(EVENT_TABLE, query.getBizId(), query.getBizId());
+//            hintManager = initHint(EVENT_TABLE, query.getBizId(), query.getBizId());
             int dataSize = eventDao.countEvent(query);
-            result.setModel(dataSize);
-            result.setSuccess(true);
+            result.success(dataSize);
         } catch (Throwable throwable) {
-            ExceptionInfo exceptionInfo = ExceptionUtil.genSystemError(throwable);
-            result.setException(exceptionInfo);
+            result.fail(Throwables.getStackTraceAsString(throwable));
             logger.error("EventManagerImpl[countEvent] is error data=" + JSON.toJSONString(query) + "error:" + throwable.getMessage());
         } finally {
-            closeHint(hintManager);
+//            closeHint(hintManager);
         }
         return result;
     }

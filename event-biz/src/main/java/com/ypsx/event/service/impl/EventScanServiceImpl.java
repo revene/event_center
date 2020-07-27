@@ -2,11 +2,11 @@ package com.ypsx.event.service.impl;
 
 import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.ypsx.event.model.Result;
 import com.ypsx.event.manager.EventScanManager;
 import com.ypsx.event.manager.EventScanNodeManager;
 import com.ypsx.event.model.Event;
 import com.ypsx.event.model.EventScanNode;
+import com.ypsx.event.model.Result;
 import com.ypsx.event.service.EventScanService;
 import com.ypsx.event.timer.Timer;
 import com.ypsx.event.timer.impl.HashedWheelTimer;
@@ -111,10 +111,9 @@ public class EventScanServiceImpl implements EventScanService {
             task.setTaskListener(this.eventTaskListener);
             //将事件包装好提交到时间轮
             timer.newTimeout(task, delay, TimeUnit.MILLISECONDS);
-            result.setSuccess(true);
+            result.success();
         } catch (Throwable throwable) {
-            result.setSuccess(false);
-            result.setErrorMessage(throwable.getMessage());
+            result.fail(Throwables.getStackTraceAsString(throwable));
             log.error("ScannerWorker[submitEvent] is error" + throwable.getMessage());
         }
         return result;
@@ -154,10 +153,9 @@ public class EventScanServiceImpl implements EventScanService {
                 //线程池中开始执行worker的扫描任务
                 threadPool.submit(worker);
             }
-            result.setSuccess(true);
+            result.success();
         } catch (Throwable throwable) {
-            result.setSuccess(false);
-            result.setErrorMessage(throwable.getMessage());
+            result.fail(Throwables.getStackTraceAsString(throwable));
             log.error("EventScanServiceImpl[scanEvent] is error, caused by {}", Throwables.getStackTraceAsString(throwable));
         }
         return result;
@@ -184,10 +182,9 @@ public class EventScanServiceImpl implements EventScanService {
                 //从当前工作线程组中移除
                 workerMap.remove(id);
             }
-            result.setSuccess(true);
+            result.success();
         } catch (Throwable throwable) {
-            result.setSuccess(false);
-            result.setErrorMessage(throwable.getMessage());
+            result.fail(Throwables.getStackTraceAsString(throwable));
             log.error("EventScanServiceImpl[cancelScanEvent] is error, caused by {}", Throwables.getStackTraceAsString(throwable));
         }
         return result;

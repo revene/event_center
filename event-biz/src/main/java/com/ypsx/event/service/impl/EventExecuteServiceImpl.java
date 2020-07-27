@@ -1,5 +1,6 @@
 package com.ypsx.event.service.impl;
 
+import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.ypsx.event.cache.EventExecuteCache;
 import com.ypsx.event.cache.EventExecuteResultCache;
@@ -9,11 +10,11 @@ import com.ypsx.event.manager.EventManager;
 import com.ypsx.event.manager.EventTypeManager;
 import com.ypsx.event.model.Event;
 import com.ypsx.event.model.EventType;
+import com.ypsx.event.model.Result;
 import com.ypsx.event.service.EventExecuteService;
 import com.ypsx.event.service.register.ConsumerServiceFactory;
 import com.ypsx.event.sevice.ConsumerService;
 import com.ypsx.event.worker.EventExecuteTask;
-import com.ypsx.util.model.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -110,7 +111,7 @@ public class EventExecuteServiceImpl implements EventExecuteService, Initializin
     public void initService() {
         Result<List<EventType>> result = eventTypeManager.listAll();
         if (result.isSuccess()) {
-            consumerServiceFactory.registerService(result.getModel());
+            consumerServiceFactory.registerService(result.getData());
         }
     }
 
@@ -132,8 +133,8 @@ public class EventExecuteServiceImpl implements EventExecuteService, Initializin
      * @param event
      */
     @Override
-    public Result<Boolean> executeEvent(Event event) {
-        Result<Boolean> executeResult = new Result<Boolean>();
+    public Result executeEvent(Event event) {
+        Result executeResult = new Result();
         try {
             //功能：获取执行的服务信息
             ConsumerService service = getService(event);
@@ -142,16 +143,12 @@ public class EventExecuteServiceImpl implements EventExecuteService, Initializin
                 EventExecuteTask task = new EventExecuteTask(event, service, eventExecuteCache, eventExecuteResultCache);
                 //直接执行
                 task.run();
-                executeResult.setModel(true);
-                executeResult.setSuccess(true);
+                executeResult.success();
             } else {
-                executeResult.setModel(false);
-                executeResult.setSuccess(false);
-                executeResult.setErrorMessage("NO SERVICE PROVIDER");
+                executeResult.fail("NO SERVICE PROVIDER");
             }
         } catch (Throwable throwable) {
-            executeResult.setSuccess(false);
-            executeResult.setErrorMessage(throwable.getMessage());
+            executeResult.fail(Throwables.getStackTraceAsString(throwable));
             logger.error("EventExecuteServiceImpl[executeEvent]  is error event:" + event.toString(), throwable);
 
         }
@@ -160,8 +157,8 @@ public class EventExecuteServiceImpl implements EventExecuteService, Initializin
 
 
     @Override
-    public Result<Boolean> submitEvent(Event event) {
-        Result<Boolean> executeResult = new Result<Boolean>();
+    public Result submitEvent(Event event) {
+        Result executeResult = new Result();
         try {
             //功能：获取服务信息
             ConsumerService service = getService(event);
@@ -170,17 +167,13 @@ public class EventExecuteServiceImpl implements EventExecuteService, Initializin
                 EventExecuteTask task = new EventExecuteTask(event, service, eventExecuteCache, eventExecuteResultCache);
                 //提交任务信息
                 threadPool.submit(task);
-                executeResult.setModel(true);
-                executeResult.setSuccess(true);
+                executeResult.success();
             } else {
-                executeResult.setModel(false);
-                executeResult.setSuccess(false);
-                executeResult.setErrorMessage("NO SERVICE PROVIDER");
+                executeResult.fail("NO SERVICE PROVIDER");
             }
 
         } catch (Throwable throwable) {
-            executeResult.setSuccess(false);
-            executeResult.setErrorMessage(throwable.getMessage());
+            executeResult.fail(Throwables.getStackTraceAsString(throwable));
             logger.error("EventExecuteServiceImpl[submitEvent]  is error event:" + event.toString(), throwable);
         }
         return executeResult;

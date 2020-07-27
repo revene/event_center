@@ -6,9 +6,9 @@ import com.ypsx.event.manager.EventScanNodeManager;
 import com.ypsx.event.model.Event;
 import com.ypsx.event.model.EventScanNode;
 import com.ypsx.event.model.EventStatus;
+import com.ypsx.event.model.Result;
 import com.ypsx.event.service.EventScanService;
 import com.ypsx.event.timer.WorkerStatus;
-import com.ypsx.util.model.Result;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StopWatch;
@@ -164,7 +164,7 @@ public class ScannerWorker implements Runnable {
                     //偏移量向后
                     offet += DEFAULT_SCAN_SIZE;
                     //获取数据列表
-                    List<Event> dataList = scanResult.getModel();
+                    List<Event> dataList = scanResult.getData();
                     //获取查询出的结果,如果没有limit的数量，说明扫到尾了,及时漏扫了，下次也能补回来
                     dataSize = dataList.size();
                     //打印日志，输出hint规格，数据索引，以及扫描行数

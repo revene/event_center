@@ -1,7 +1,5 @@
 package com.ypsx.event.model;
 
-
-
 /**
  * 返回的结果包装类
  *
@@ -13,7 +11,7 @@ public class Result<T> {
     /**
      * 是否响应成功
      */
-    private boolean isSuccess;
+    private boolean success;
 
     /**
      * 响应结果
@@ -29,14 +27,14 @@ public class Result<T> {
      * 无参构造函数
      */
     public Result() {
-        this.isSuccess = false;
+        this.success = false;
     }
 
     /**
      * 设置成功
      */
     public void success() {
-        this.isSuccess = Boolean.TRUE;
+        this.success = Boolean.TRUE;
     }
 
     /**
@@ -55,7 +53,24 @@ public class Result<T> {
      * @param errorMessage 失败的原因
      */
     public void fail(String errorMessage) {
-        this.isSuccess = Boolean.FALSE;
+        this.success = Boolean.FALSE;
         this.errorMessage = errorMessage;
+    }
+
+    /**
+     * 判断执行结果是否成功
+     *
+     * @return true or false
+     */
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public T getData() {
+        return data;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
     }
 }

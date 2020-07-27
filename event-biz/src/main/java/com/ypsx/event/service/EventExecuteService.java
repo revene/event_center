@@ -1,9 +1,8 @@
 package com.ypsx.event.service;
 
 import com.ypsx.event.model.Event;
+import com.ypsx.event.model.Result;
 import com.ypsx.event.sevice.ConsumerService;
-import com.ypsx.event.sevice.EventConsumerService;
-import com.ypsx.util.model.Result;
 
 /**
  * 功能：事件执行服务
@@ -33,7 +32,7 @@ public interface EventExecuteService {
      * @param event
      * @return
      */
-    public Result<Boolean> executeEvent(Event event);
+    public Result executeEvent(Event event);
 
 
     /**
@@ -42,5 +41,5 @@ public interface EventExecuteService {
      * @param event
      * @return
      */
-    public Result<Boolean> submitEvent(Event event);
+    public Result submitEvent(Event event);
 }

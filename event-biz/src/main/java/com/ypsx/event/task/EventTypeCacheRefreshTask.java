@@ -3,7 +3,7 @@ package com.ypsx.event.task;
 import com.ypsx.event.cache.EventTypeCache;
 import com.ypsx.event.manager.EventTypeManager;
 import com.ypsx.event.model.EventType;
-import com.ypsx.util.model.Result;
+import com.ypsx.event.model.Result;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -42,7 +42,7 @@ public class EventTypeCacheRefreshTask implements ApplicationListener<ContextRef
         Result<List<EventType>> result = eventTypeManager.listAll();
         if (result.isSuccess()) {
             //获取数据列表信息
-            List<EventType> dataList = result.getModel();
+            List<EventType> dataList = result.getData();
             for (EventType eventType : dataList) {
                 //讲数据添加到缓存中
                 EventTypeCache.getInstance().addEventType(eventType);
@@ -63,7 +63,7 @@ public class EventTypeCacheRefreshTask implements ApplicationListener<ContextRef
             //执行缓存
             Result<List<EventType>> result = cacheUpdate();
             if (!result.isSuccess()) {
-                throw new RuntimeException("EventTypeCacheRefreshTask is error" + result.getErrorMessage());
+                throw new RuntimeException("EventTypeCacheRefreshTask is error" + result);
             }
         }
     }

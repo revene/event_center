@@ -5,7 +5,6 @@ import com.ypsx.event.manager.EventScanNodeManager;
 import com.ypsx.event.model.EventScanNode;
 import com.ypsx.event.service.EventScanService;
 import com.ypsx.event.util.IpUtil;
-import com.ypsx.util.model.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ApplicationContextEvent;

@@ -1,8 +1,10 @@
 package com.ypsx.event.web.api;
 
+import com.google.common.base.Throwables;
+import com.ypsx.event.entity.EventQuery;
 import com.ypsx.event.manager.EventScanManager;
 import com.ypsx.event.model.Event;
-import com.ypsx.util.model.Result;
+import com.ypsx.event.model.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -36,11 +38,12 @@ public class EventScanApi {
         try {
             long startTime = 0;
             long endTime = System.currentTimeMillis();
-            result = eventScanManager.scanList(tableIndex, 0, startTime, endTime, 0, 50);
+            EventQuery eventQuery = new EventQuery();
+//            eventQuery.setStatus();
+//            result = eventScanManager.scanList(tableIndex, 0, startTime, endTime, 0, 50);
         } catch (Throwable throwable) {
             result = new Result<>();
-            result.setSuccess(false);
-            result.setErrorMessage(throwable.getMessage());
+            result.fail(Throwables.getStackTraceAsString(throwable));
             logger.error("EventScanApi[scan] is error" + throwable.getMessage());
         }
         return result;

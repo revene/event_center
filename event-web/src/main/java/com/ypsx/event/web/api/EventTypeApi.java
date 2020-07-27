@@ -1,13 +1,12 @@
 package com.ypsx.event.web.api;
 
-import com.ypsx.event.error.ExceptionUtil;
+import com.google.common.base.Throwables;
 import com.ypsx.event.manager.EventTypeManager;
 import com.ypsx.event.model.EventType;
+import com.ypsx.event.model.Result;
 import com.ypsx.event.web.request.EventTypeRequest;
 import com.ypsx.event.web.request.EventTypeUpdateRequest;
 import com.ypsx.event.web.vo.EventTypeVO;
-import com.ypsx.util.model.ExceptionInfo;
-import com.ypsx.util.model.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.dozer.DozerBeanMapperBuilder;
@@ -26,7 +25,9 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * @author chuchengyi
+ * 事件类型web端
+ *
+ * @author wangbaoliang
  */
 @Controller
 @RequestMapping(value = "eventType")
@@ -55,8 +56,7 @@ public class EventTypeApi {
             eventType.setGmtModify(new Date());
             result = eventTypeManager.saveEventType(eventType);
         } catch (Throwable throwable) {
-            ExceptionInfo exceptionInfo = ExceptionUtil.genSystemError(throwable);
-            result.setException(exceptionInfo);
+            result.fail(Throwables.getStackTraceAsString(throwable));
             logger.error("EventTypeApi[add] is error" + throwable.getMessage());
 
         }
@@ -73,8 +73,7 @@ public class EventTypeApi {
             Long eventTypeId = eventTypeVO.getId();
             result = eventTypeManager.activeEventType(eventTypeId);
         } catch (Throwable throwable) {
-            ExceptionInfo exceptionInfo = ExceptionUtil.genSystemError(throwable);
-            result.setException(exceptionInfo);
+            result.fail(Throwables.getStackTraceAsString(throwable));
             logger.error("EventTypeApi[active] is error" + throwable.getMessage());
         }
         return result;
@@ -90,8 +89,7 @@ public class EventTypeApi {
             EventType updateEventType = DozerBeanMapperBuilder.buildDefault().map(eventTypeVO, EventType.class);
             result = eventTypeManager.updateEventType(updateEventType);
         } catch (Throwable throwable) {
-            ExceptionInfo exceptionInfo = ExceptionUtil.genSystemError(throwable);
-            result.setException(exceptionInfo);
+            result.fail(Throwables.getStackTraceAsString(throwable));
             logger.error("EventTypeApi[update] is error" + throwable.getMessage());
         }
         return result;
@@ -107,20 +105,17 @@ public class EventTypeApi {
             List<EventTypeVO> resultDataList = new ArrayList<>();
             Result<List<EventType>> queryResult = eventTypeManager.listEventType(request.getAppCode());
             if (queryResult.isSuccess()) {
-                List<EventType> dataList = queryResult.getModel();
+                List<EventType> dataList = queryResult.getData();
                 for (EventType data : dataList) {
                     EventTypeVO eventTypeVO = DozerBeanMapperBuilder.buildDefault().map(data, EventTypeVO.class);
                     resultDataList.add(eventTypeVO);
                 }
-                result.setModel(resultDataList);
-                result.setSuccess(true);
+                result.success(resultDataList);
             } else {
-                result.setErrorCode(queryResult.getErrorCode());
-                result.setErrorMessage(queryResult.getErrorMessage());
+                result.fail(queryResult.getErrorMessage());
             }
         } catch (Throwable throwable) {
-            ExceptionInfo exceptionInfo = ExceptionUtil.genSystemError(throwable);
-            result.setException(exceptionInfo);
+            result.fail(Throwables.getStackTraceAsString(throwable));
             logger.error("EventTypeApi[list] is error" + throwable.getMessage());
 
         }

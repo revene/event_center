@@ -1,13 +1,14 @@
 package com.ypsx.event.service.impl;
 
 import com.alibaba.dubbo.config.annotation.Service;
+import com.google.common.base.Throwables;
 import com.ypsx.event.manager.EventLogManager;
 import com.ypsx.event.manager.EventManager;
 import com.ypsx.event.model.Event;
 import com.ypsx.event.model.EventResult;
+import com.ypsx.event.model.Result;
 import com.ypsx.event.service.EventScanService;
 import com.ypsx.event.sevice.EventPublishService;
-import com.ypsx.util.model.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,32 +58,29 @@ public class EventPublishServiceImpl implements EventPublishService {
                 }
             }
         } catch (Throwable throwable) {
-            result.setSuccess(false);
-            result.setErrorMessage(throwable.getMessage());
+            result.fail(Throwables.getStackTraceAsString(throwable));
             logger.error("EventPublishServiceImpl[publishEvent] is error:" + throwable.getMessage());
         }
         return result;
     }
 
     @Override
-    public Result<Boolean> cancelEvent(Event event) {
+    public Result cancelEvent(Event event) {
         return null;
     }
 
     @Override
-    public Result<Boolean> successEvent(Event event) {
+    public Result successEvent(Event event) {
         return null;
     }
 
     @Override
-    public Result<Boolean> reportEventExecute(Event event, EventResult eventResult) {
-        Result<Boolean> result = new Result<Boolean>();
+    public Result reportEventExecute(Event event, EventResult eventResult) {
+        Result result = new Result();
         try {
             eventLogManager.saveEventLog(eventResult, event);
         } catch (Throwable throwable) {
-            result.setModel(false);
-            result.setSuccess(false);
-            result.setErrorMessage(throwable.getMessage());
+            result.fail(Throwables.getStackTraceAsString(throwable));
             logger.error("EventPublishServiceImpl[reportEventExecute] is error:" + throwable.getMessage());
         }
         return result;

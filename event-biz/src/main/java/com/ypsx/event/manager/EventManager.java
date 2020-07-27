@@ -2,14 +2,14 @@ package com.ypsx.event.manager;
 
 import com.ypsx.event.model.Event;
 import com.ypsx.event.model.EventQuery;
-import com.ypsx.util.model.Result;
+import com.ypsx.event.model.Result;
 
 import java.util.List;
 
 /**
- * 功能：事件管理的功能
+ * 事件管理manager
  *
- * @author chuchengyi
+ * @author wangbaoliang
  */
 public interface EventManager {
 
@@ -29,7 +29,7 @@ public interface EventManager {
      * @param event
      * @return
      */
-    public Result<Boolean> updateEvent(Event event);
+    public Result updateEvent(Event event);
 
 
     /**

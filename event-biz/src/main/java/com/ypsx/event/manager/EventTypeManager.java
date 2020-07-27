@@ -1,7 +1,7 @@
 package com.ypsx.event.manager;
 
 import com.ypsx.event.model.EventType;
-import com.ypsx.util.model.Result;
+import com.ypsx.event.model.Result;
 
 import java.util.List;
 
@@ -44,7 +44,7 @@ public interface EventTypeManager {
      * @param updateEventType
      * @return
      */
-    Result<Boolean> updateEventType(EventType updateEventType);
+    Result updateEventType(EventType updateEventType);
 
 
     /**
@@ -53,5 +53,5 @@ public interface EventTypeManager {
      * @param eventTypeId
      * @return
      */
-    Result<Boolean> activeEventType(Long eventTypeId);
+    Result activeEventType(Long eventTypeId);
 }
