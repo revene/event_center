@@ -1,10 +1,6 @@
 package com.ypsx.event.manager;
 
-import com.ypsx.event.model.Event;
-import com.ypsx.event.model.EventLog;
-import com.ypsx.event.model.EventLogQuery;
-import com.ypsx.event.model.EventResult;
-import com.ypsx.util.model.Result;
+import com.ypsx.event.model.*;
 
 import java.util.List;
 

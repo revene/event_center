@@ -15,8 +15,6 @@
  */
 package com.ypsx.event.timer.impl;
 
-import javax.validation.constraints.NotNull;
-
 import com.ypsx.event.timer.Timeout;
 import com.ypsx.event.timer.Timer;
 import com.ypsx.event.timer.TimerTask;
@@ -340,7 +338,7 @@ public class HashedWheelTimer implements Timer {
 
 
     @Override
-    public Timeout newTimeout(@NotNull TimerTask task, long delay, @NotNull TimeUnit unit) {
+    public Timeout newTimeout(TimerTask task, long delay, TimeUnit unit) {
         //当缓存中不包含任务的时间才添加 Key是event的主键id
         if (!this.getDataIndexMap().containsKey(task.getId())) {
             //计数器，没在时间轮中添加一个事件就将count+1;

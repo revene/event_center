@@ -25,17 +25,16 @@ import javax.annotation.Resource;
 import static com.ypsx.event.util.ParamUtil.isEmpty;
 
 /**
- * @author chuchengyi
+ * 事件服务实现类
+ *
+ * @author wangbaoliang
  */
 @Component
-public class EventManagerImpl extends AbstractHintManager implements EventManager {
+public class EventManagerImpl implements EventManager {
 
 
     @Resource
     private EventDao eventDao;
-
-    @Resource
-    private IpKeyGenerator ipKeyGenerator;
 
     /**
      * 功能：日志信息打印

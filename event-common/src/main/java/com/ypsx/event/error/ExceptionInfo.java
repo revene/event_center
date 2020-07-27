@@ -1,25 +1,30 @@
 package com.ypsx.event.error;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
 /**
- * @author chuchengyi
+ * 异常信息
+ *
+ * @author wangbaoliang
  */
-public interface ExceptionInfo {
-
-
-    /**
-     * 功能：获取错误编码
-     *
-     * @return
-     */
-    public String getCode();
-
+@Data
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+public class ExceptionInfo {
 
     /**
-     * 功能：获取一个错误消息
-     *
-     * @return
+     * 异常编码
      */
-    public String getMessage();
+    private String exceptionCode;
+
+    /**
+     * 异常信息描述
+     */
+    private String exceptionMessage;
 
 
 }

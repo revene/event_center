@@ -1,10 +1,11 @@
 package com.ypsx.event.error;
 
-import com.ypsx.util.model.ExceptionInfo;
-import com.ypsx.util.model.Result;
+import com.ypsx.event.model.Result;
 
 /**
- * @author chuchengyi
+ * 异常工具
+ *
+ * @author wangbaoliang
  */
 public class ExceptionUtil {
 
@@ -21,8 +22,7 @@ public class ExceptionUtil {
      * @param exception
      */
     public static void setException(Result result, ExceptionInfo exception) {
-        result.setErrorCode(exception.getErrorCode());
-        result.setErrorMessage(exception.getErrorMessage());
+        result.fail(exception.getExceptionMessage());
     }
 
 
@@ -34,8 +34,8 @@ public class ExceptionUtil {
      */
     public static ExceptionInfo genSystemError(Throwable throwable) {
         ExceptionInfo exceptionInfo = new ExceptionInfo();
-        exceptionInfo.setErrorCode(SYSTEM_ERROR);
-        exceptionInfo.setErrorMessage(throwable.getMessage());
+        exceptionInfo.setExceptionCode(SYSTEM_ERROR);
+        exceptionInfo.setExceptionMessage(throwable.getMessage());
         return exceptionInfo;
     }
 }

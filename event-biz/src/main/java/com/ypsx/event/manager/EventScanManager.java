@@ -2,7 +2,7 @@ package com.ypsx.event.manager;
 
 import com.ypsx.event.entity.EventQuery;
 import com.ypsx.event.model.Event;
-import com.ypsx.util.model.Result;
+import com.ypsx.event.model.Result;
 
 import java.util.List;
 

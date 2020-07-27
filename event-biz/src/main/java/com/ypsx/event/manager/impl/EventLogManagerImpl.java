@@ -1,16 +1,11 @@
 package com.ypsx.event.manager.impl;
 
+import com.google.common.base.Throwables;
 import com.ypsx.event.cache.EventExecuteLogCache;
 import com.ypsx.event.dao.EventLogDao;
 import com.ypsx.event.manager.EventLogManager;
-import com.ypsx.event.model.Event;
-import com.ypsx.event.model.EventLog;
-import com.ypsx.event.model.EventLogQuery;
-import com.ypsx.event.model.EventResult;
-import com.ypsx.event.sharing.IpKeyGenerator;
+import com.ypsx.event.model.*;
 import com.ypsx.event.util.IpUtil;
-import com.ypsx.util.model.Result;
-import io.shardingsphere.api.HintManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -27,12 +22,10 @@ import java.util.List;
  * @author chuchengyi
  */
 @Component
-public class EventLogManagerImpl extends AbstractHintManager implements EventLogManager {
+public class EventLogManagerImpl implements EventLogManager {
 
     @Resource
     private EventLogDao eventLogDao;
-    @Resource
-    private IpKeyGenerator ipKeyGenerator;
     @Resource
     private EventExecuteLogCache eventExecuteLogCache;
 
@@ -45,25 +38,24 @@ public class EventLogManagerImpl extends AbstractHintManager implements EventLog
     @Override
     public Result<Boolean> saveEventLog(EventLog eventLog) {
         Result<Boolean> result = new Result<Boolean>();
-        HintManager hintManager = null;
+//        HintManager hintManager = null;
         try {
-            //判断是否存在
-            if (!eventExecuteLogCache.isExecuteLog(eventLog)) {
-                eventLog.setId(ipKeyGenerator.generateKey().longValue());
-                eventLog.setGmtCreate(new Date());
-                eventLog.setGmtModify(new Date());
-                hintManager = initHint(LOG_TABLE, eventLog.getBizId(), eventLog.getBizId());
-                eventLogDao.insertEventLog(eventLog);
-                eventExecuteLogCache.addExecuteLog(eventLog);
-                result.setModel(true);
-                result.setSuccess(true);
-            }
+//            //判断是否存在
+//            if (!eventExecuteLogCache.isExecuteLog(eventLog)) {
+//                eventLog.setId(ipKeyGenerator.generateKey().longValue());
+//                eventLog.setGmtCreate(new Date());
+//                eventLog.setGmtModify(new Date());
+//                hintManager = initHint(LOG_TABLE, eventLog.getBizId(), eventLog.getBizId());
+//                eventLogDao.insertEventLog(eventLog);
+//                eventExecuteLogCache.addExecuteLog(eventLog);
+//                result.setModel(true);
+//                result.setSuccess(true);
+//            }
         } catch (Throwable throwable) {
-            result.setSuccess(false);
-            result.setErrorMessage(throwable.getMessage());
+            result.fail(Throwables.getStackTraceAsString(throwable));
             logger.error("EventLogManagerImpl[saveEventLog] is error ：" + throwable.getMessage());
         } finally {
-            hintManager.close();
+//            hintManager.close();
         }
         return result;
     }
@@ -103,8 +95,7 @@ public class EventLogManagerImpl extends AbstractHintManager implements EventLog
             //保存日志信息
             saveResult = this.saveEventLog(eventLog);
         } catch (Throwable throwable) {
-            saveResult.setSuccess(false);
-            saveResult.setErrorMessage(throwable.getMessage());
+            saveResult.fail(Throwables.getStackTraceAsString(throwable));
             logger.error("EventLogManagerImpl[saveEventLog] is error ：" + throwable.getMessage());
         }
         return saveResult;
@@ -114,18 +105,17 @@ public class EventLogManagerImpl extends AbstractHintManager implements EventLog
     @Override
     public Result<List<EventLog>> listEventLog(EventLogQuery query) {
         Result<List<EventLog>> result = new Result<>();
-        HintManager hintManager = null;
+//        HintManager hintManager = null;
         try {
-            hintManager = initHint(LOG_TABLE, query.getBizId(), query.getBizId());
-            List<EventLog> list = eventLogDao.listEventLog(query);
-            result.setModel(list);
-            result.setSuccess(true);
+//            hintManager = initHint(LOG_TABLE, query.getBizId(), query.getBizId());
+//            List<EventLog> list = eventLogDao.listEventLog(query);
+//            result.setModel(list);
+//            result.setSuccess(true);
         } catch (Throwable throwable) {
-            result.setSuccess(false);
-            result.setErrorMessage(throwable.getMessage());
+            result.fail(Throwables.getStackTraceAsString(throwable));
             logger.error("EventLogManagerImpl[listEventLog] is error ：" + throwable.getMessage());
         } finally {
-            hintManager.close();
+//            hintManager.close();
         }
         return result;
     }
@@ -134,17 +124,17 @@ public class EventLogManagerImpl extends AbstractHintManager implements EventLog
     @Override
     public Result<Integer> countEventLog(EventLogQuery query) {
         Result<Integer> result = new Result<>();
-        HintManager hintManager = null;
+//        HintManager hintManager = null;
         try {
-            hintManager = initHint(LOG_TABLE, query.getBizId(), query.getBizId());
-            int dataSize = eventLogDao.countEventLog(query);
-            result.setModel(dataSize);
-            result.setSuccess(true);
+//            hintManager = initHint(LOG_TABLE, query.getBizId(), query.getBizId());
+//            int dataSize = eventLogDao.countEventLog(query);
+//            result.setModel(dataSize);
+//            result.setSuccess(true);
         } catch (Throwable throwable) {
-            result.setErrorMessage(throwable.getMessage());
+            result.fail(Throwables.getStackTraceAsString(throwable));
             logger.error("EventLogManagerImpl[countEventLog] is error ：" + throwable.getMessage());
         } finally {
-            hintManager.close();
+//            hintManager.close();
         }
         return result;
     }

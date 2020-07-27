@@ -1,11 +1,9 @@
 package com.ypsx.event.error;
 
-import com.ypsx.util.model.ExceptionInfo;
-
 /**
  * 功能：系统异常的常量类
  *
- * @author chuchengyi
+ * @author wangbaoliang
  */
 public class ExceptionConstant {
 

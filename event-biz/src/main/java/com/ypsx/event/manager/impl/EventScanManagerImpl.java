@@ -5,8 +5,7 @@ import com.ypsx.event.dao.EventDao;
 import com.ypsx.event.entity.EventQuery;
 import com.ypsx.event.manager.EventScanManager;
 import com.ypsx.event.model.Event;
-import com.ypsx.util.model.Result;
-import io.shardingsphere.api.HintManager;
+import com.ypsx.event.model.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +19,7 @@ import java.util.List;
  */
 @Slf4j
 @Component
-public class EventScanManagerImpl extends AbstractHintManager implements EventScanManager {
+public class EventScanManagerImpl implements EventScanManager {
 
 
     /**
@@ -41,17 +40,17 @@ public class EventScanManagerImpl extends AbstractHintManager implements EventSc
     @Override
     public Result<List<Event>> scanList(EventQuery eventQuery, int tableIndex) {
         Result<List<Event>> result = new Result<>();
-        //try-with-resource语法初始化hintManager,结束自动关闭
-        try (HintManager hintManager = initHint(EVENT_TABLE, tableIndex);) {
-            List<Event> dataList = eventDao.scanEvent(eventQuery.getStatus(), eventQuery.getStartTime(),
-                    eventQuery.getEndTime(), eventQuery.getOffset(), eventQuery.getLimit());
-            result.setModel(dataList);
-            result.setSuccess(true);
-        } catch (Throwable throwable) {
-            result.setErrorMessage(throwable.getMessage());
-            result.setSuccess(false);
-            log.error("EventScanManagerImpl[scanList] is error, caused by {}", Throwables.getStackTraceAsString(throwable));
-        }
+//        //try-with-resource语法初始化hintManager,结束自动关闭
+//        try (HintManager hintManager = initHint(EVENT_TABLE, tableIndex);) {
+//            List<Event> dataList = eventDao.scanEvent(eventQuery.getStatus(), eventQuery.getStartTime(),
+//                    eventQuery.getEndTime(), eventQuery.getOffset(), eventQuery.getLimit());
+//            result.setModel(dataList);
+//            result.setSuccess(true);
+//        } catch (Throwable throwable) {
+//            result.setErrorMessage(throwable.getMessage());
+//            result.setSuccess(false);
+//            log.error("EventScanManagerImpl[scanList] is error, caused by {}", Throwables.getStackTraceAsString(throwable));
+//        }
         return result;
     }
 
