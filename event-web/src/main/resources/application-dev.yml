@@ -1,0 +1,57 @@
+database:
+  split:
+    table:
+      size: 2
+databse0:
+  url: jdbc:mysql://rm-uf6ob58h18s2kw2q37o.mysql.rds.aliyuncs.com/event_center_dev?characterEncoding=utf-8&useSSL=false
+databse1:
+  url: jdbc:mysql://rm-uf6ob58h18s2kw2q37o.mysql.rds.aliyuncs.com/event_center_dev_1?characterEncoding=utf-8&useSSL=false
+env:
+  dev: true
+event:
+  execute:
+    thread:
+      max:
+        size: 64
+      min:
+        size: 10
+  update:
+    result:
+      thread:
+        size: 32
+logging:
+  config: classpath:logback-boot.xml
+mysql:
+  driver-class-name: com.mysql.jdbc.Driver
+  password: $5T@w4iS8YtEux1j
+  username: develop
+spring:
+  dubbo:
+    application:
+      id: event_center
+      name: event_center
+    protocol:
+      name: dubbo
+      port: 20880
+    registry:
+      address: zookeeper://172.16.4.158:2181
+    scan: com.ypsx.event.service.impl
+    server: true
+  http:
+    encoding:
+      force: true
+  redis:
+    database: 0
+    host: r-uf64798d0e840294.redis.rds.aliyuncs.com
+    password: 5d7p9Rx89$s3^s%x
+    pool:
+      max-active: 200
+      max-idle: 50
+      max-wait: 3000
+      min-idle: 10
+    port: 6379
+    timeout: 1000
+  session:
+    store-type: none
+swagger:
+  enable: true
