@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.ypsx.event.dao.EventScanNodeDao">
+
+
+    <resultMap id="eventNodeResultMap" type="com.ypsx.event.model.EventScanNode">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="ip" jdbcType="VARCHAR" property="ip"/>
+        <result column="node" jdbcType="VARCHAR" property="node"/>
+        <result column="scan_time" jdbcType="BIGINT" property="scanTime"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate"/>
+        <result column="gmt_modify" jdbcType="TIMESTAMP" property="gmtModify"/>
+        <result column="table_index" jdbcType="INTEGER" property="tableIndex"/>
+    </resultMap>
+
+    <sql id="cols_all">
+     id, ip, node, scan_time, `status`, gmt_create, gmt_modify, table_index
+   </sql>
+
+
+    <select id="listAll" resultMap="eventNodeResultMap" parameterType="map">
+        SELECT
+        <include refid="cols_all"/>
+        FROM
+        event_scan
+    </select>
+
+
+</mapper>
