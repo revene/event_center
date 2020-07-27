@@ -7,10 +7,12 @@ package com.ypsx.event.model;
  */
 
 public enum EventTypeStatus {
+
     /**
      * 默认激活状态
      */
     CREATE(0, "创建状态"),
+
     /**
      * 某一次执行失败了
      */

@@ -18,7 +18,6 @@ package com.ypsx.event.timer.impl;
 import com.ypsx.event.timer.Timeout;
 import com.ypsx.event.timer.Timer;
 import com.ypsx.event.timer.TimerTask;
-import org.jctools.maps.NonBlockingHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,7 +84,7 @@ public class HashedWheelTimer implements Timer {
     /**
      * 功能：定义时间轮的数据索引
      */
-    private final NonBlockingHashMap<String, String> dataIndexMap = new NonBlockingHashMap<>();
+    private final ConcurrentHashMap<String, String> dataIndexMap = new ConcurrentHashMap<>();
 
     /**
      * 功能：等待排队的时间轮数据
@@ -426,7 +425,7 @@ public class HashedWheelTimer implements Timer {
         return bucketList;
     }
 
-    public NonBlockingHashMap<String, String> getDataIndexMap() {
+    public ConcurrentHashMap<String, String> getDataIndexMap() {
         return dataIndexMap;
     }
 }

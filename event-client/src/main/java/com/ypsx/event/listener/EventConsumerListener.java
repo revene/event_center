@@ -4,26 +4,26 @@ import com.ypsx.event.model.Event;
 import com.ypsx.event.model.EventResult;
 
 /**
- * @author chuchengyi
+ * 事件消费监听器接口
+ *
+ * @author blanc
  */
 public interface EventConsumerListener {
 
+    /**
+     * 要消费的事件类型
+     *
+     * @return eventType
+     */
+    String getEventType();
 
     /**
-     * 功能：获取到事件类型
+     * 消费事件的具体逻辑
      *
-     * @return
+     * @param event 要消费事件
+     * @return 消费事件的结果
      */
-    public String getEventType();
-
-
-    /**
-     * 功能：小费具体的事件信息
-     *
-     * @param event
-     * @return
-     */
-    public EventResult consumerEvent(Event event);
+    EventResult consumerEvent(Event event);
 
 
 }

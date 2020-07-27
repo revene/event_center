@@ -1,16 +1,17 @@
 package com.ypsx.event.model;
 
 /**
- * 功能：事件通道
+ * 事件通道枚举
  *
- * @author chuchengyi
+ * @author wangbaoliang
  */
-
 public enum EventChanel {
+
     /**
      * Dubbo服务通道
      */
     DUBBO("DUBBO", "服务通道"),
+
     /**
      * 消息通道
      */

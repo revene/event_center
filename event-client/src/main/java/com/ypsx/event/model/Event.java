@@ -9,73 +9,76 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * @author chuchengyi
+ * client端事件类型
+ *
+ * @author wangbaoliang
  */
 public class Event implements Serializable {
 
     private static final long serialVersionUID = 3786803311680105329L;
 
     /**
-     * 功能:数据ID
+     * 主键id
      */
     private Long id;
 
     /**
-     * 功能：状态
+     * 事件状态
      *
      * @see EventStatus
      */
     private Integer status;
+
     /**
-     * 功能：执行次数
+     * 事件的执行次数
      */
     private Long executeSize;
 
     /**
-     * 功能：创建时间
+     * 事件的创建时间
      */
     private Date gmtCreate;
 
     /**
-     * 功能：修改时间
+     * 事件的最近修改时间
      */
     private Date gmtModify;
 
 
     /***
-     * 功能：执行时间
+     * 事件的下一个执行时间
      */
     private Long executeTime;
 
 
     /**
-     * 功能：应用标识
+     * 应用标识
      */
     private String appCode;
 
     /**
-     * 功能：事件类型
+     * 事件类型
      */
     private String eventType;
 
     /**
-     * 功能：业务唯一标识
+     * 业务唯一标识
      */
     private String bizId;
 
     /**
-     * 功能：事件的版本号
+     * 事件的版本号
      */
     private Long version;
 
     /**
-     * 功能：返回调用目标IP
+     * 返回调用目标IP
      */
     private String targetIp;
 
 
     /**
-     * 功能：消息发送的通道
+     * 消息发送的通道
      *
      * @see EventChanel
      */

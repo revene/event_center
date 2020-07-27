@@ -61,20 +61,6 @@
                 </configuration>
             </plugin>
         </plugins>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <!-- 资源根目录排除各环境的配置，防止在生成目录中多余其它目录 -->
-                <excludes>
-                    <exclude>test/*</exclude>
-                    <exclude>prod/*</exclude>
-                    <exclude>dev/*</exclude>
-                </excludes>
-            </resource>
-            <resource>
-                <directory>src/main/resources/${profiles.active}</directory>
-            </resource>
-        </resources>
     </build>
 
 

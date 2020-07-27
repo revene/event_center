@@ -6,17 +6,18 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 功能：事件消费的结果
+ * 事件消费结果
  *
- * @author chuchengyi
+ * @author blanc
  */
 public class EventResult implements Serializable {
+
     private static final long serialVersionUID = -5080434235070838656L;
+
     /**
-     * 功能：判断是否成功
+     * 事件是否执行成功
      */
     private boolean success;
-
 
     /**
      * 功能：设置是否需要需要重试 默认为true success 为true的时候不起作用 当为false 如果需要retry系统不会在重复推送
@@ -28,31 +29,29 @@ public class EventResult implements Serializable {
      */
     private Long nextExecuteTime;
 
-
     /**
      * 功能:调用客户端的ip
      */
     private String clientIp;
-
 
     /**
      * 功能：执行的错误信息
      */
     private String errorMessage;
 
-
     /**
      * 功能：开始执行时间
      */
     private Date startExecute;
-
 
     /**
      * 功能：结束执行时间
      */
     private Date endExecute;
 
-
+    /**
+     * 默认的构造函数
+     */
     public EventResult() {
         //默认设置为true
         this.retry = true;

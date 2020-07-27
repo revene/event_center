@@ -1,7 +1,7 @@
 package com.ypsx.event.model;
 
 /**
- * 事件的状态
+ * 事件的状态枚举
  *
  * @author wangbaoliang
  */

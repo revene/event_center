@@ -6,53 +6,66 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @author chuchengyi
+ * 事件类型对象
+ *
+ * @author blanc
  */
 public class EventType implements Serializable {
 
     private static final long serialVersionUID = 5168418112364497670L;
+
     /**
-     * 功能：数据ID
+     * 事件类型主键id
      */
     private long id;
+
     /**
-     * 功能：应用标识
+     * 应用标识
      */
     private String appCode;
 
     /**
-     * 功能：事件类型名称
+     * 事件类型名称
      */
     private String name;
 
-
     /**
-     * 功能：事件的类型
+     * 事件的类型编码,例如:
+     * WMS_SYN_REQUIREMENT
      */
     private String eventType;
+
     /**
-     * 功能：最大执行次数
+     * 最大执行次数
      */
     private long maxExecuteSize;
+
     /**
-     * 功能：当前的状态
+     * 这个事件类型的当前状态
+     *
+     * @see EventTypeStatus
      */
     private long status;
+
     /**
-     * 功能：执行的调度间隔
+     * 重试的间隔时间
      */
     private long scheduleTime;
+
     /**
-     * 功能：创建时间
+     * 事件创建时间
      */
     private Date gmtCreate;
+
     /**
-     * 功能：修改时间
+     * 最近修改时间
      */
     private Date gmtModify;
 
     /**
-     * 功能：定时任务
+     * 是否是定时任务
+     * 1: 是定时任务事件
+     * 2: 普通事件
      */
     private Integer schedule;
 
