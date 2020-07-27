@@ -1,0 +1,29 @@
+dataSources:
+  ds0: !!org.apache.commons.dbcp.BasicDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://cdb-5cjecjfk.bj.tencentcdb.com:10085/event_center_0
+    username: root
+    password: w4247794
+  ds1: !!org.apache.commons.dbcp.BasicDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://cdb-5cjecjfk.bj.tencentcdb.com:10085/event_center_1
+    username: root
+    password: w4247794
+
+shardingRule:
+  tables:
+    event:
+      actualDataNodes: event_center_${0..1}.event_${0..7}
+      databaseStrategy:
+        hint:
+          algorithmClassName: org.apache.shardingsphere.userAlgo.HintAlgorithm
+      tableStrategy:
+        hint:
+          algorithmClassName: org.apache.shardingsphere.userAlgo.HintAlgorithm
+  defaultTableStrategy:
+    none:
+  defaultKeyGenerator:
+    type: SNOWFLAKE
+    column: id
+props:
+  sql.show: true

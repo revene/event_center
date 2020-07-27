@@ -5,3 +5,5 @@ spring:
     name: event_center
   profiles:
     active: dev
+mybatis:
+  mapper-locations: classpath*:/mappers/*.xml

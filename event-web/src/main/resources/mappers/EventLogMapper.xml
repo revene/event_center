@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright (c) 2018 安徽谊品弘科技有限公司
+  -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.blanc.event.dao.EventLogDao">
+    <resultMap id="eventLogResultMap" type="com.blanc.event.model.EventLog">
+        <result column="ID" jdbcType="BIGINT" property="id"/>
+        <result column="app_code" jdbcType="VARCHAR" property="appCode"/>
+        <result column="event_type" jdbcType="VARCHAR" property="eventType"/>
+        <result column="biz_id" jdbcType="VARCHAR" property="bizId"/>
+        <result column="execute_time" jdbcType="TIMESTAMP" property="executeTime"/>
+        <result column="success" jdbcType="INTEGER" property="success"/>
+        <result column="error_message" jdbcType="VARCHAR" property="errorMessage"/>
+        <result column="execute_ip" jdbcType="VARCHAR" property="executeIp"/>
+        <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate"/>
+        <result column="gmt_modify" jdbcType="TIMESTAMP" property="gmtModify"/>
+        <result column="execute_index" jdbcType="INTEGER" property="executeIndex"/>
+
+        <result column="start_execute" jdbcType="TIMESTAMP" property="startExecute"/>
+        <result column="end_execute" jdbcType="TIMESTAMP" property="endExecute"/>
+
+        <result column="cost_time" jdbcType="BIGINT" property="costTime"/>
+
+        <result column="event_id" jdbcType="BIGINT" property="eventId"/>
+
+
+    </resultMap>
+
+
+    <sql id="cols_all">
+    ID, app_code, event_type, biz_id, execute_time, success, error_message, execute_ip, 
+    gmt_create, gmt_modify, execute_index,start_execute,end_execute,cost_time,event_id
+  </sql>
+
+    <insert id="insertEventLog" parameterType="com.blanc.event.model.EventLog">
+    insert into event_log (ID, app_code, event_type, 
+      biz_id, execute_time, success,  error_message, execute_ip, gmt_create, gmt_modify,execute_index,start_execute,end_execute,cost_time,event_id)
+    values (#{id,jdbcType=BIGINT}, #{appCode,jdbcType=VARCHAR}, #{eventType,jdbcType=VARCHAR}, 
+      #{bizId,jdbcType=VARCHAR}, #{executeTime,jdbcType=TIMESTAMP}, #{success,jdbcType=INTEGER}, 
+      #{errorMessage,jdbcType=VARCHAR}, #{executeIp,jdbcType=VARCHAR}, #{gmtCreate,jdbcType=TIMESTAMP}, 
+      #{gmtModify,jdbcType=TIMESTAMP}, #{executeIndex,jdbcType=INTEGER}, #{startExecute,jdbcType=TIMESTAMP},
+      #{endExecute,jdbcType=TIMESTAMP},#{costTime,jdbcType=BIGINT},#{eventId,jdbcType=BIGINT})
+  </insert>
+
+
+    <select id="listEventLog" resultMap="eventLogResultMap" parameterType="com.blanc.event.model.EventLogQuery">
+        SELECT
+        <include refid="cols_all"/>
+        FROM
+        event_log
+        <where>
+            <if test="id != null">
+                AND id = #{id}
+            </if>
+
+            <if test="eventId != null">
+                AND event_id = #{eventId}
+            </if>
+
+            <if test="bizId != null">
+                AND biz_id = #{bizId}
+            </if>
+
+        </where>
+        <if test="start != null">
+            order by gmt_create desc limit #{start},#{pageSize}
+        </if>
+    </select>
+
+
+    <select id="countEventLog" resultType="int" parameterType="com.blanc.event.model.EventLogQuery">
+        SELECT count(id)
+        FROM
+        event_log
+        <where>
+            <if test="id != null">
+                AND id = #{id}
+            </if>
+
+            <if test="eventId != null">
+                AND event_id = #{eventId}
+            </if>
+
+            <if test="bizId != null">
+                AND biz_id = #{bizId}
+            </if>
+        </where>
+    </select>
+
+</mapper>

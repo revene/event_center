@@ -17,7 +17,7 @@
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="shardingDataSource"/>
         <property name="typeAliasesPackage" value="com.ypsx.store.core.entity"/>
-        <property name="mapperLocations" value="classpath:/mappings/**/*.xml"/>
+        <property name="mapperLocations" value="classpath:/mappers/**/*.xml"/>
         <property name="configLocation" value="classpath:/mybatis-config.xml"></property>
         <property name="vfs" value="org.mybatis.spring.boot.autoconfigure.SpringBootVFS"/>
     </bean>

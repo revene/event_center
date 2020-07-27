@@ -1,8 +1,7 @@
 package com.event.test;
 
-import com.ypsx.event.model.Event;
-import com.ypsx.event.sevice.EventPublishService;
-import com.ypsx.event.sevice.EventScheduleConsumerService;
+import com.blanc.event.model.Event;
+import com.blanc.event.sevice.EventScheduleConsumerService;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
