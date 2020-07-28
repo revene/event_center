@@ -18,7 +18,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.shardingsphere</groupId>
-            <artifactId>sharding-jdbc-spring-boot-starter</artifactId>
+            <artifactId>sharding-jdbc-core</artifactId>
         </dependency>
         <dependency>
             <groupId>com.alibaba</groupId>

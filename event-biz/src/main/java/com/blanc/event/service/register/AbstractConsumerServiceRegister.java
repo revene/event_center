@@ -17,12 +17,9 @@ import javax.annotation.Resource;
 public abstract class AbstractConsumerServiceRegister {
 
 
-    @Autowired
-    protected RegistryConfig registryConfig;
-    @Autowired
-    protected ApplicationConfig applicationConfig;
-    @Autowired
-    protected ProtocolConfig protocol;
+    protected RegistryConfig registryConfig = new RegistryConfig();
+    protected ApplicationConfig applicationConfig = new ApplicationConfig();
+    protected ProtocolConfig protocol = new ProtocolConfig();
 
     @Resource(name="normalConsumerServiceHandler")
     protected EventConsumerServiceHandler normalConsumerServiceHandler;

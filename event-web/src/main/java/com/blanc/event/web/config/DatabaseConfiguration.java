@@ -24,7 +24,7 @@ public class DatabaseConfiguration {
      * @return sharding数据源
      */
     @Bean
-    public DataSource dataSource() throws IOException, SQLException {
+    public DataSource dataSources() throws IOException, SQLException {
         return YamlShardingDataSourceFactory.createDataSource(getFile("/sharding-config.yml"));
     }
 
