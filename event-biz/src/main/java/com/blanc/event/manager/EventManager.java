@@ -20,7 +20,7 @@ public interface EventManager {
      * @param event
      * @return
      */
-    public Result<String> saveEvent(Event event);
+    Result<Long> saveEvent(Event event);
 
 
     /**
@@ -29,7 +29,7 @@ public interface EventManager {
      * @param event
      * @return
      */
-    public Result updateEvent(Event event);
+    Result updateEvent(Event event);
 
 
     /**
@@ -47,5 +47,5 @@ public interface EventManager {
      * @param query
      * @return
      */
-    public Result<Integer> countEvent(EventQuery query);
+    Result<Integer> countEvent(EventQuery query);
 }

@@ -15,10 +15,10 @@ public interface EventPublishService {
     /**
      * 功能：发布事件
      *
-     * @param event
+     * @param event 要发布的事件
      * @return
      */
-    Result<String> publishEvent(Event event);
+    Result<Long> publishEvent(Event event);
 
 
     /**

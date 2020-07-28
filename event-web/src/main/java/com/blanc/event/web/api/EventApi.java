@@ -49,8 +49,8 @@ public class EventApi {
     @ResponseBody
     @ApiOperation("添加事件")
     @RequestMapping(value = "add", method = RequestMethod.POST)
-    public Result<String> add(@RequestBody EventRequest eventVO) throws Exception {
-        Result<String> result = null;
+    public Result<Long> add(@RequestBody EventRequest eventVO) throws Exception {
+        Result<Long> result = new Result<>();
         try {
             Event event = new Event();
             BeanUtils.copyProperties(eventVO, event);

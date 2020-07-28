@@ -15,9 +15,9 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Resource;
 
 /**
- * 功能：服务实现方式的事件发布
+ * 发布事件的实现类
  *
- * @author chuchengyi
+ * @author wangbaoliang
  */
 @Service(version = "1.0")
 public class EventPublishServiceImpl implements EventPublishService {
@@ -40,8 +40,8 @@ public class EventPublishServiceImpl implements EventPublishService {
     private final static Logger logger = LoggerFactory.getLogger("eventLog");
 
     @Override
-    public Result<String> publishEvent(Event event) {
-        Result<String> result = new Result<String>();
+    public Result<Long> publishEvent(Event event) {
+        Result<Long> result = new Result<>();
         try {
             //保存事件信息
             result = eventManager.saveEvent(event);

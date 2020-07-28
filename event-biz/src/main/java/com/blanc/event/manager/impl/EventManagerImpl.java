@@ -36,9 +36,8 @@ public class EventManagerImpl implements EventManager {
 
 
     @Override
-    public Result<String> saveEvent(Event event) {
-
-        Result<String> result = new Result<String>();
+    public Result<Long> saveEvent(Event event) {
+        Result<Long> result = new Result();
         try {
             //检测输入信息是是否正确
 //            ExceptionInfo exceptionCode = checkParam(event);
@@ -65,7 +64,7 @@ public class EventManagerImpl implements EventManager {
                 setEventInfo(event, eventType);
                 //保存事件信息
                 doSaveEvent(event);
-                result.success(event.getId() + "");
+                result.success(event.getId());
             }
 
         } catch (Throwable throwable) {

@@ -152,7 +152,7 @@ public class EventTypeManagerImpl implements EventTypeManager {
                 int schedule = updateEventType.getSchedule().intValue();
                 if (EventTaskType.isScheduleTask(schedule)) {
                     Event event = createEvent(updateEventType);
-                    Result<String> eventResult = eventManager.saveEvent(event);
+                    Result<Long> eventResult = eventManager.saveEvent(event);
                     if (!eventResult.isSuccess()) {
                         throw new Exception(eventResult.getErrorMessage());
                     }
