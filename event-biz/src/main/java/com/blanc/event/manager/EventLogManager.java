@@ -1,7 +1,6 @@
 package com.blanc.event.manager;
 
 import com.blanc.event.model.*;
-import com.ypsx.event.model.*;
 
 import java.util.List;
 

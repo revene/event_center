@@ -16,7 +16,15 @@ public abstract class AbstractEventConsumerService {
     /**
      * 功能：获取系统的ip信息
      */
-    protected InetAddress address = IpUtil.getLocalHostDress();
+    protected InetAddress address;
+
+    {
+        try {
+            address = IpUtil.getLocalHostDress();
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+    }
 
 
     /**

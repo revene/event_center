@@ -1,0 +1,31 @@
+dataSources:
+  ds0: !!com.alibaba.druid.pool.DruidDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://cdb-5cjecjfk.bj.tencentcdb.com:10085/event_center_0
+    username: root
+    password: Ww4247794!
+  ds1: !!com.alibaba.druid.pool.DruidDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://cdb-5cjecjfk.bj.tencentcdb.com:10085/event_center_1
+    username: root
+    password: Ww4247794!
+
+shardingRule:
+  tables:
+    event:
+      actualDataNodes: ds${0..1}.event_${0..7}
+      databaseStrategy:
+        hint:
+          algorithmClassName: com.blanc.event.sharding.ModuloHintShardingAlgorithm
+      tableStrategy:
+        hint:
+          algorithmClassName: com.blanc.event.sharding.ModuloHintShardingAlgorithm
+      keyGenerator:
+        type: SNOWFLAKE
+        column: id
+  defaultDatabaseStrategy:
+    none:
+  defaultTableStrategy:
+    none:
+props:
+  sql.show: true

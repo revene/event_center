@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
  */
 @Data
 @Slf4j(topic = "eventLog")
-public class ScannerWorker implements Runnable {
+public class EventScanWorker implements Runnable {
 
     /**
      * 当前线程的状态
@@ -39,8 +39,8 @@ public class ScannerWorker implements Runnable {
     /**
      * 功能：状态属性的修改器
      */
-    private static final AtomicIntegerFieldUpdater<ScannerWorker> STATE_UPDATER =
-            AtomicIntegerFieldUpdater.newUpdater(ScannerWorker.class, STATUS);
+    private static final AtomicIntegerFieldUpdater<EventScanWorker> STATE_UPDATER =
+            AtomicIntegerFieldUpdater.newUpdater(EventScanWorker.class, STATUS);
 
     /**
      * 扫描的节点,一个节点scanNode对应一个scanWorkerx
@@ -95,7 +95,7 @@ public class ScannerWorker implements Runnable {
     /**
      * 无参构造器
      */
-    public ScannerWorker() {
+    public EventScanWorker() {
         //初始化状态
         this.status = WorkerStatus.INIT.getStatus();
     }
@@ -105,7 +105,7 @@ public class ScannerWorker implements Runnable {
      *
      * @param eventScanNode 事件扫描节点
      */
-    public ScannerWorker(EventScanNode eventScanNode) {
+    public EventScanWorker(EventScanNode eventScanNode) {
         //scanWorker中持有了scanNode
         this.eventScanNode = eventScanNode;
         //设置为初始化的状态
@@ -211,7 +211,7 @@ public class ScannerWorker implements Runnable {
         eventQuery.setStartTime(startTime);
         eventQuery.setEndTime(endTime);
         eventQuery.setOffset(offset);
-        eventQuery.setLimit(ScannerWorker.DEFAULT_SCAN_SIZE);
+        eventQuery.setLimit(EventScanWorker.DEFAULT_SCAN_SIZE);
         return eventQuery;
     }
 

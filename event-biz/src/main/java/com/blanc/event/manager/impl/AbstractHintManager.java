@@ -1,6 +1,6 @@
 package com.blanc.event.manager.impl;
 
-import com.blanc.event.sharing.HintTableExpression;
+import com.blanc.event.sharding.HintTableExpression;
 import org.apache.shardingsphere.api.hint.HintManager;
 
 import javax.annotation.Resource;

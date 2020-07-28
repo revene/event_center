@@ -1,4 +1,4 @@
-package com.blanc.event.sharing;
+package com.blanc.event.sharding;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;

@@ -45,11 +45,9 @@ public class EventScanManagerImpl extends AbstractHintManager implements EventSc
         try (HintManager hintManager = initHint(EVENT_TABLE, tableIndex);) {
             List<Event> dataList = eventDao.scanEvent(eventQuery.getStatus(), eventQuery.getStartTime(),
                     eventQuery.getEndTime(), eventQuery.getOffset(), eventQuery.getLimit());
-            result.setModel(dataList);
-            result.setSuccess(true);
+            result.success(dataList);
         } catch (Throwable throwable) {
-            result.setErrorMessage(throwable.getMessage());
-            result.setSuccess(false);
+            result.fail(Throwables.getStackTraceAsString(throwable));
             log.error("EventScanManagerImpl[scanList] is error, caused by {}", Throwables.getStackTraceAsString(throwable));
         }
         return result;

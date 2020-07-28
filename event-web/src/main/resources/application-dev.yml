@@ -1,11 +1,3 @@
-database:
-  split:
-    table:
-      size: 2
-databse0:
-  url: jdbc:mysql://rm-uf6ob58h18s2kw2q37o.mysql.rds.aliyuncs.com/event_center_dev?characterEncoding=utf-8&useSSL=false
-databse1:
-  url: jdbc:mysql://rm-uf6ob58h18s2kw2q37o.mysql.rds.aliyuncs.com/event_center_dev_1?characterEncoding=utf-8&useSSL=false
 env:
   dev: true
 event:
@@ -21,10 +13,6 @@ event:
         size: 32
 logging:
   config: classpath:logback-boot.xml
-mysql:
-  driver-class-name: com.mysql.jdbc.Driver
-  password: $5T@w4iS8YtEux1j
-  username: develop
 spring:
   dubbo:
     application:

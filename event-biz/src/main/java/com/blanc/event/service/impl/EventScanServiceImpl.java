@@ -12,7 +12,7 @@ import com.blanc.event.timer.Timer;
 import com.blanc.event.timer.impl.HashedWheelTimer;
 import com.blanc.event.worker.EventTaskListener;
 import com.blanc.event.worker.EventTimerTask;
-import com.blanc.event.worker.ScannerWorker;
+import com.blanc.event.worker.EventScanWorker;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -67,7 +67,7 @@ public class EventScanServiceImpl implements EventScanService {
      * key:
      * value: 扫描事件的工作线程
      */
-    private Map<Long, ScannerWorker> workerMap = new ConcurrentHashMap<>();
+    private Map<Long, EventScanWorker> workerMap = new ConcurrentHashMap<>();
 
     /**
      * 功能：设置时间轮
@@ -139,7 +139,7 @@ public class EventScanServiceImpl implements EventScanService {
              */
             if (!workerMap.containsKey(node.getId())) {
                 //构造扫描event的工作线程,并且设置对应的节点
-                ScannerWorker worker = new ScannerWorker(node);
+                EventScanWorker worker = new EventScanWorker(node);
                 //设置事件扫描服务 里面有线程池等等
                 worker.setEventScanService(this);
                 //设置事件扫描器 用来扫描event
@@ -176,7 +176,7 @@ public class EventScanServiceImpl implements EventScanService {
             //如果workMap中包含了这个ScanWork
             if (workerMap.containsKey(id)) {
                 //获取到这个ScanWork
-                ScannerWorker worker = workerMap.get(id);
+                EventScanWorker worker = workerMap.get(id);
                 //功能 停止工作
                 worker.stop();
                 //从当前工作线程组中移除

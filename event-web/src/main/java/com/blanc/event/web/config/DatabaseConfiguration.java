@@ -2,6 +2,7 @@ package com.blanc.event.web.config;
 
 import org.apache.shardingsphere.shardingjdbc.api.yaml.YamlShardingDataSourceFactory;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 import javax.sql.DataSource;
 import java.io.File;
@@ -14,6 +15,7 @@ import java.sql.SQLException;
  * @author ：blanc
  * @date ：Created in 2020/7/27 下午11:32
  */
+@Configuration
 public class DatabaseConfiguration {
 
     /**
@@ -23,6 +25,17 @@ public class DatabaseConfiguration {
      */
     @Bean
     public DataSource dataSource() throws IOException, SQLException {
-        return YamlShardingDataSourceFactory.createDataSource(new File("sharding.yml"));
+        return YamlShardingDataSourceFactory.createDataSource(getFile("/sharding-config.yml"));
     }
+
+    /**
+     * 获取配置文件
+     *
+     * @param configFile 配置文件
+     * @return sharding配置文件
+     */
+    private File getFile(String configFile) {
+        return new File(Thread.currentThread().getClass().getResource(configFile).getFile());
+    }
+
 }
