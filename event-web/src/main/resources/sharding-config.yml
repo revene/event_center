@@ -23,6 +23,17 @@ shardingRule:
       keyGenerator:
         type: SNOWFLAKE
         column: id
+    event_log:
+      actualDataNodes: ds${0..1}.event_log_${0..15}
+      databaseStrategy:
+        hint:
+          algorithmClassName: com.blanc.event.sharding.ModuloHintShardingAlgorithm
+      tableStrategy:
+        hint:
+          algorithmClassName: com.blanc.event.sharding.ModuloHintShardingAlgorithm
+      keyGenerator:
+        type: SNOWFLAKE
+        column: id
   defaultDatabaseStrategy:
     none:
   defaultTableStrategy:
