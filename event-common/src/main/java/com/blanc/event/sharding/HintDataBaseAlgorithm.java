@@ -1,9 +1,8 @@
-//package com.ypsx.event.sharing;
+//package com.blanc.event.sharding;
 //
-//import io.shardingsphere.api.algorithm.sharding.ListShardingValue;
-//import io.shardingsphere.api.algorithm.sharding.PreciseShardingValue;
-//import io.shardingsphere.api.algorithm.sharding.ShardingValue;
-//import io.shardingsphere.api.algorithm.sharding.hint.HintShardingAlgorithm;
+//import org.apache.shardingsphere.api.sharding.ShardingValue;
+//import org.apache.shardingsphere.api.sharding.hint.HintShardingAlgorithm;
+//import org.apache.shardingsphere.api.sharding.standard.PreciseShardingValue;
 //import org.springframework.beans.factory.annotation.Value;
 //import org.springframework.stereotype.Component;
 //
@@ -12,9 +11,7 @@
 //import java.util.Collection;
 //import java.util.List;
 //
-///**
-// * @author chuchengyi
-// */
+//
 //@Component("hintDataBaseAlgorithm")
 //public class HintDataBaseAlgorithm extends AbstractHintAlgorithm implements HintShardingAlgorithm {
 //

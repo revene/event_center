@@ -16,10 +16,10 @@ shardingRule:
       actualDataNodes: ds${0..1}.event_${0..7}
       databaseStrategy:
         hint:
-          algorithmClassName: com.blanc.event.sharding.ModuloHintShardingAlgorithm
+          algorithmClassName: com.blanc.event.sharding.DataBaseHintShardingAlgorithm
       tableStrategy:
         hint:
-          algorithmClassName: com.blanc.event.sharding.ModuloHintShardingAlgorithm
+          algorithmClassName: com.blanc.event.sharding.TableHintShardingAlgorithm
       keyGenerator:
         type: SNOWFLAKE
         column: id
@@ -27,13 +27,17 @@ shardingRule:
       actualDataNodes: ds${0..1}.event_log_${0..15}
       databaseStrategy:
         hint:
-          algorithmClassName: com.blanc.event.sharding.ModuloHintShardingAlgorithm
+          algorithmClassName: com.blanc.event.sharding.DataBaseHintShardingAlgorithm
       tableStrategy:
         hint:
-          algorithmClassName: com.blanc.event.sharding.ModuloHintShardingAlgorithm
+          algorithmClassName: com.blanc.event.sharding.TableHintShardingAlgorithm
       keyGenerator:
         type: SNOWFLAKE
         column: id
+    event_type:
+      actualDataNodes: ds0.event_type
+    event_scan:
+      actualDataNodes: ds0.event_scan
   defaultDatabaseStrategy:
     none:
   defaultTableStrategy:

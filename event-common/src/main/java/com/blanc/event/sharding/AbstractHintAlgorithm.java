@@ -1,7 +1,6 @@
-//package com.ypsx.event.sharing;
+//package com.blanc.event.sharding;
 //
-//import io.shardingsphere.api.algorithm.sharding.ListShardingValue;
-//import io.shardingsphere.api.algorithm.sharding.PreciseShardingValue;
+//import org.apache.shardingsphere.api.sharding.standard.PreciseShardingValue;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
 //

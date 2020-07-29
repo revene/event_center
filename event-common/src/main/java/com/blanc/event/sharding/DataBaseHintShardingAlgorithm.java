@@ -28,14 +28,14 @@ import java.util.Collection;
  *
  * @author wangbaoliang
  */
-public final class ModuloHintShardingAlgorithm implements HintShardingAlgorithm<Long> {
+public final class DataBaseHintShardingAlgorithm implements HintShardingAlgorithm<String> {
 
     @Override
-    public Collection<String> doSharding(final Collection<String> availableTargetNames, final HintShardingValue<Long> shardingValue) {
+    public Collection<String> doSharding(final Collection<String> availableTargetNames, final HintShardingValue<String> shardingValue) {
         Collection<String> result = new ArrayList<>();
         for (String each : availableTargetNames) {
-            for (Long value : shardingValue.getValues()) {
-                if (each.endsWith(String.valueOf(value % 2))) {
+            for (String value : shardingValue.getValues()) {
+                if (each.endsWith(String.valueOf(Integer.valueOf(value) % 2))) {
                     result.add(each);
                 }
             }

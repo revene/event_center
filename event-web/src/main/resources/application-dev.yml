@@ -14,17 +14,6 @@ event:
 logging:
   config: classpath:logback-boot.xml
 spring:
-  dubbo:
-    application:
-      id: event_center
-      name: event_center
-    protocol:
-      name: dubbo
-      port: 20880
-    registry:
-      address: zookeeper://172.16.4.158:2181
-    scan: com.ypsx.event.service.impl
-    server: true
   http:
     encoding:
       force: true

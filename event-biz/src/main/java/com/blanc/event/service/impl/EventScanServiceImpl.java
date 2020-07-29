@@ -151,7 +151,7 @@ public class EventScanServiceImpl implements EventScanService {
                 //将数据节点放到工作线程的缓存中
                 workerMap.put(node.getId(), worker);
                 //线程池中开始执行worker的扫描任务
-                threadPool.submit(worker);
+//                threadPool.submit(worker);
             }
             result.success();
         } catch (Throwable throwable) {
