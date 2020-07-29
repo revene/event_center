@@ -31,10 +31,10 @@
    </sql>
 
     <insert id="insertEvent" parameterType="com.blanc.event.model.Event">
-      insert into event (id, app_code, event_type,biz_id, request, `status`,execute_size, target_ip, gmt_create,
+      insert into event (app_code, event_type,biz_id, request, `status`,execute_size, target_ip, gmt_create,
       gmt_modify, receive_chanel, execute_time,version
       )
-    values (#{id,jdbcType=BIGINT}, #{appCode,jdbcType=VARCHAR}, #{eventType,jdbcType=VARCHAR},
+    values (#{appCode,jdbcType=VARCHAR}, #{eventType,jdbcType=VARCHAR},
       #{bizId,jdbcType=VARCHAR}, #{request,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER},
       #{executeSize,jdbcType=INTEGER}, #{targetIp,jdbcType=VARCHAR}, #{gmtCreate,jdbcType=TIMESTAMP},
       #{gmtModify,jdbcType=TIMESTAMP}, #{receiveChanel,jdbcType=VARCHAR}, #{executeTime,jdbcType=BIGINT}, #{version,jdbcType=BIGINT}
