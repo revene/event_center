@@ -19,23 +19,30 @@ package com.blanc.event.sharding;
 
 import org.apache.shardingsphere.api.sharding.hint.HintShardingAlgorithm;
 import org.apache.shardingsphere.api.sharding.hint.HintShardingValue;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * sharding hint算法
+ * sharding 数据源hint算法
+ * tableindex:路由索引 % 分库数量
  *
  * @author wangbaoliang
  */
-public final class DataBaseHintShardingAlgorithm implements HintShardingAlgorithm<String> {
+public final class DataBaseHintShardingAlgorithm implements HintShardingAlgorithm<Integer> {
+
+    /**
+     * sharding分库的数量
+     */
+    public static final Integer DATABASE_SIZE = 2;
 
     @Override
-    public Collection<String> doSharding(final Collection<String> availableTargetNames, final HintShardingValue<String> shardingValue) {
+    public Collection<String> doSharding(final Collection<String> availableTargetNames, final HintShardingValue<Integer> shardingValue) {
         Collection<String> result = new ArrayList<>();
         for (String each : availableTargetNames) {
-            for (String value : shardingValue.getValues()) {
-                if (each.endsWith(String.valueOf(Integer.valueOf(value) % 2))) {
+            for (Integer value : shardingValue.getValues()) {
+                if (each.endsWith(String.valueOf(value % 2))) {
                     result.add(each);
                 }
             }

@@ -31,7 +31,7 @@ public class EventDaoTest extends AbstractHintManager {
 
     @Test
     public void getEvent() {
-        try (final HintManager hintManager = initHintWithDatabaseOnly("1")) {
+        try (final HintManager hintManager = initHint("event",2)) {
             eventDao.getEvent("wms","a","xix",1L);
             assert true;
         }catch (Throwable throwable){

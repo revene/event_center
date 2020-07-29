@@ -61,16 +61,14 @@ public abstract class AbstractHintManager {
      * 功能：初始化HINT的路由算法(只包含表路由,即没有分库)
      *
      * @param table      要强制路由的表
-     * @param tableIndex 表路由索引
+     * @param tableIndex 库路由索引 + 表路由索引
      * @return hintManager实例
      */
     public HintManager initHint(String table, int tableIndex) {
         HintManager hintManager = HintManager.getInstance();
-        String shareIndex = hintTableExpression.genExpression(tableIndex);
-        hintManager.addDatabaseShardingValue(table, shareIndex);
-        hintManager.addTableShardingValue(table, shareIndex);
+        hintManager.addDatabaseShardingValue(table, tableIndex);
+        hintManager.addTableShardingValue(table, tableIndex);
         return hintManager;
-
     }
 
     /**

@@ -24,20 +24,35 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * table 的hint算法
+ * table:event 的hint分表算法
+ *
+ * @author wangbaoliang
  */
-public final class TableHintShardingAlgorithm implements HintShardingAlgorithm<Long> {
+public final class TableHintShardingAlgorithm implements HintShardingAlgorithm<Integer> {
+
+    /**
+     * 数据库里nodeScan配置的扫描节点的总数量
+     */
+    private static final Integer NODE_COUNT = 4;
+
+    /**
+     * 平均每个数据库落下的扫描节点的数量
+     */
+    private static final Integer NODE_PER_DATABASE = DataBaseHintShardingAlgorithm.DATABASE_SIZE / NODE_COUNT;
 
     @Override
-    public Collection<String> doSharding(final Collection<String> availableTargetNames, final HintShardingValue<Long> shardingValue) {
+    public Collection<String> doSharding(final Collection<String> availableTargetNames, final HintShardingValue<Integer> shardingValue) {
         Collection<String> result = new ArrayList<>();
         for (String each : availableTargetNames) {
-            for (Long value : shardingValue.getValues()) {
-                if (each.endsWith(String.valueOf(value % 2))) {
+            //取出物理表的尾号
+            final Integer tableIndex = Integer.valueOf(each.split("_")[1]);
+            for (Integer value : shardingValue.getValues()) {
+                if (tableIndex % DataBaseHintShardingAlgorithm.DATABASE_SIZE == value / DataBaseHintShardingAlgorithm.DATABASE_SIZE){
                     result.add(each);
                 }
             }
         }
+        System.out.println(result);
         return result;
     }
 }

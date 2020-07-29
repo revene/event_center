@@ -42,7 +42,7 @@ public class EventScanManagerImpl extends AbstractHintManager implements EventSc
     public Result<List<Event>> scanList(EventQuery eventQuery, int tableIndex) {
         Result<List<Event>> result = new Result<>();
         //try-with-resource语法初始化hintManager,结束自动关闭
-        try (HintManager hintManager = initHint(EVENT_TABLE, tableIndex);) {
+        try (HintManager hintManager = initHint(EVENT_TABLE, tableIndex)) {
             List<Event> dataList = eventDao.scanEvent(eventQuery.getStatus(), eventQuery.getStartTime(),
                     eventQuery.getEndTime(), eventQuery.getOffset(), eventQuery.getLimit());
             result.success(dataList);
