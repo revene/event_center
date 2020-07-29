@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * table:event 的hint分表算法
+ * table:event,event_log 的hint分表算法
  *
  * @author wangbaoliang
  */

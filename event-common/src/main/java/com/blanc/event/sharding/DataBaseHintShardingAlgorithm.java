@@ -42,7 +42,7 @@ public final class DataBaseHintShardingAlgorithm implements HintShardingAlgorith
         Collection<String> result = new ArrayList<>();
         for (String each : availableTargetNames) {
             for (Integer value : shardingValue.getValues()) {
-                if (each.endsWith(String.valueOf(value % 2))) {
+                if (each.endsWith(String.valueOf(value % DATABASE_SIZE))) {
                     result.add(each);
                 }
             }
