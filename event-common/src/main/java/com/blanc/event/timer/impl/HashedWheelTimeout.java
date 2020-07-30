@@ -3,6 +3,7 @@ package com.blanc.event.timer.impl;
 import com.blanc.event.timer.Timeout;
 import com.blanc.event.timer.Timer;
 import com.blanc.event.timer.TimerTask;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,26 +11,24 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
 /**
- * 功能：整个时间轮
+ * 时间轮中的定时任务项:里面封装了真正的定时任务TimerTask
  *
- * @author chuchengyi
+ * @author wangbaoliang
  */
+@Slf4j(topic = "timer")
 public class HashedWheelTimeout implements Timeout {
 
-
-    /**
-     * 功能：定义日志信息
-     */
-    private final static Logger logger = LoggerFactory.getLogger("timerLog");
 
     /**
      * 功能：初始化状态
      */
     public static final int ST_INIT = 0;
+
     /**
      * 功能：取消状态
      */
     public static final int ST_CANCELLED = 1;
+
     /**
      * 功能：是否超时
      */
@@ -37,6 +36,7 @@ public class HashedWheelTimeout implements Timeout {
 
 
     private static final String STATE_FER = "state";
+
     /**
      * 功能：使用CAS原理的乐观锁来更新状态字段
      */
@@ -44,6 +44,7 @@ public class HashedWheelTimeout implements Timeout {
             AtomicIntegerFieldUpdater.newUpdater(HashedWheelTimeout.class, STATE_FER);
 
     public final HashedWheelTimer timer;
+
     /**
      * 功能：任务信息
      */
@@ -140,7 +141,7 @@ public class HashedWheelTimeout implements Timeout {
             this.timer.getDataIndexMap().remove(task.getId());
             task.run(this);
         } catch (Throwable t) {
-            logger.warn("An exception was thrown by " + TimerTask.class.getSimpleName() + '.', t);
+            log.warn("An exception was thrown by " + TimerTask.class.getSimpleName() + '.', t);
 
         }
     }

@@ -50,7 +50,7 @@ public class EventScanNodeTask implements ApplicationListener<ApplicationContext
             //获取到本机的ip地址信息,内网ip
             InetAddress address = IpUtil.getLocalHostDress();
             String ip = address.getHostAddress();
-            log.info("EvenScanNodeTask [eventScanNode] local ip is : {} " + ip);
+            log.info("EvenScanNodeTask [eventScanNode] local ip is : {} ", ip);
             //获取到具体的扫描节点
             List<EventScanNode> nodeList = eventScanNodeManager.listAll();
             if (CollectionUtils.isEmpty(nodeList)) {

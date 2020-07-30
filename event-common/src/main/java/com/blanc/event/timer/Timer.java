@@ -18,27 +18,24 @@ package com.blanc.event.timer;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-
 /**
- * 功能：时间轮接口信息
+ * 时间轮提供的方法接口
  *
- * @author chuchengyi
+ * @author wangbaoliang
  */
 public interface Timer {
 
     /**
-     * 功能：将数据加入到时间轮
+     * 将一个timerTask定时任务加入到时间轮中
      *
-     * @param task
-     * @param delay
-     * @param unit
-     * @return
+     * @param task  封装的定时任务
+     * @param delay 延迟执行时间
+     * @param unit  延迟执行事件单位
+     * @return 时间轮执行单位
      */
     Timeout newTimeout(TimerTask task, long delay, TimeUnit unit);
 
     /**
-     * 功能：停止时间轮
-     *
      * @return
      */
     Set<Timeout> stop();

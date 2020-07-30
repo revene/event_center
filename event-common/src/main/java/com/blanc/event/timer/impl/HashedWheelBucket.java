@@ -5,8 +5,9 @@ import com.blanc.event.timer.Timeout;
 import java.util.Set;
 
 /**
- * 功能：时间轮的数据数据bucket,就是一个链表
- * @author chuchengyi
+ * 时间轮中的定时任务列表:桶
+ *
+ * @author wangbaoliang
  */
 public class HashedWheelBucket {
 
@@ -22,6 +23,7 @@ public class HashedWheelBucket {
 
     /**
      * 功能：构造一个时间轮数据对象放到数据桶中
+     *
      * @param timeout
      */
     public void addTimeout(HashedWheelTimeout timeout) {

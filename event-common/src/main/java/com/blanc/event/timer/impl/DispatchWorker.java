@@ -2,6 +2,7 @@ package com.blanc.event.timer.impl;
 
 import com.blanc.event.timer.Timeout;
 import com.blanc.event.timer.WorkerStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,26 +14,26 @@ import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 /**
  * 功能：时间轮的调度线程
  *
- * @author chuchengyi
+ * @author blanc
  */
+@Slf4j(topic = "timer")
 public class DispatchWorker implements Runnable {
 
 
     /**
-     * 功能：时间tick
+     * 时间tick指针
      */
     private long tick;
 
     /**
-     * 功能：设置开始时间
+     * 启动时间
      */
     private long startTime;
 
     /**
-     * 功能：时间轮对象
+     * 时间轮
      */
     private HashedWheelTimer timer;
-
 
     /**
      * 功能：当前线程的状态
@@ -44,38 +45,33 @@ public class DispatchWorker implements Runnable {
      */
     private static final String STATE_NAME = "workerState";
 
-
     /**
      * 功能：未处理列表
      */
     private final Set<Timeout> unprocessedTimeouts = new HashSet<Timeout>();
 
-
     /**
-     * 功能：每次分发的记录数
+     *
      */
     private static final int DISPATCH_SIZE = 100000;
 
-
     /**
-     * 功能:索引修改信息
+     * 状态cas修改器
      */
     private static final AtomicIntegerFieldUpdater<DispatchWorker> WORKER_STATE_UPDATER =
             AtomicIntegerFieldUpdater.newUpdater(DispatchWorker.class, STATE_NAME);
 
-
     /**
-     * 功能：定义日志信息
+     * 构造器,一个时间轮一个DispatchWorker
+     *
+     * @param timer 时间轮
      */
-    private final static Logger logger = LoggerFactory.getLogger("timerLog");
-
-
     public DispatchWorker(HashedWheelTimer timer) {
         this.timer = timer;
     }
 
     /**
-     * 功能：将服务器设置为启动状态
+     * 设置当前调度线程为启动状态
      */
     public void start() {
         int initStatus = WorkerStatus.INIT.getStatus();
@@ -91,34 +87,39 @@ public class DispatchWorker implements Runnable {
                 break;
             }
         }
-
-        logger.info("DispatchWorker[start] is success!");
-
+        log.info("DispatchWorker[start] is success!");
     }
 
     /**
-     * 功能：判断是否启动
+     * 判断当前调度线程是否已经启动
      *
-     * @return
+     * @return true or false
      */
     public boolean isStart() {
         int startStatus = WorkerStatus.STARTED.getStatus();
         return WORKER_STATE_UPDATER.get(this) == startStatus;
     }
 
+    /**
+     * 具体启动的执行逻辑
+     */
     @Override
     public void run() {
+        //获取毫秒单位的当前时间戳
         startTime = System.nanoTime();
         if (startTime == 0) {
             startTime = 1;
         }
-        //设置启动时间
+        //给时间轮设置启动时间
         timer.setStartTime(startTime);
-        //释放启动锁
+        /**
+         * 释放启动锁,通过CountDownLatch保证只有一个线程完成此操作
+         * 因为时间轮的启动是第一个时间轮的任务放入的时候去启动的,所以会有并发的问题
+         */
         timer.getTimerInitialLock().countDown();
-
         int startStatus = WorkerStatus.STARTED.getStatus();
         while (WORKER_STATE_UPDATER.get(DispatchWorker.this) == startStatus) {
+            //计算并休眠到下一个tick,deadline是当前时间和startTime的便宜
             final long deadline = waitForNextTick();
             if (deadline > 0) {
                 int idx = (int) (tick & timer.getBucketIndexMask());
@@ -129,7 +130,7 @@ public class DispatchWorker implements Runnable {
                 tick++;
             }
         }
-        logger.info("DispatchWorker is stop running success!");
+        log.info("DispatchWorker is stop running success!");
         //停止扫尾工作：将不能处理的数据移动未处理的队列
         dispatchUnProcess();
         //停止扫尾工作：将取消数据的移动取消队列
@@ -190,7 +191,7 @@ public class DispatchWorker implements Runnable {
             try {
                 timeout.remove();
             } catch (Throwable t) {
-                logger.warn("DispatchWorker[processCancelledTask]  is error", t);
+                log.warn("DispatchWorker[processCancelledTask]  is error", t);
             }
         }
     }
@@ -201,11 +202,14 @@ public class DispatchWorker implements Runnable {
      * @return
      */
     private long waitForNextTick() {
+        //计算下个tick的deadline和startTime的偏移总量
         long deadline = timer.getTickDuration() * (tick + 1);
-
         while (true) {
+            //获取当前时间和startTime的偏移
             final long currentTime = System.nanoTime() - startTime;
+            //计算距离下次tick应该休眠的时间,/1000000是为了转换成毫秒,为了sleep准备(sleep只能以毫秒为单位)
             long sleepTimeMs = (deadline - currentTime + 999999) / 1000000;
+            //不需要睡眠直接返回
             if (sleepTimeMs <= 0) {
                 if (currentTime == Long.MIN_VALUE) {
                     return -Long.MAX_VALUE;
@@ -218,6 +222,7 @@ public class DispatchWorker implements Runnable {
                 sleepTimeMs = sleepTimeMs / 10 * 10;
             }
             try {
+                //休眠到下一个tick为止
                 Thread.sleep(sleepTimeMs);
             } catch (InterruptedException ignored) {
                 if (WORKER_STATE_UPDATER.get(this) == WorkerStatus.SHUTDOWN.getStatus()) {

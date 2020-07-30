@@ -3,31 +3,30 @@ package com.blanc.event.timer;
 
 
 /**
- * 功能：超时数据接口的定义
+ * HashWheelTimeout(时间轮任务的基本单位)的接口
  *
- * @author chuchengyi
+ * @author wangbaoliang
  */
 public interface Timeout {
 
-
     /**
-     * 功能：返回时间轮对象
+     * 获取所在的时间轮 HashedWheelTimer
      *
-     * @return
+     * @return 时间轮
      */
     Timer timer();
 
     /**
-     * 功能：返回具体执行任务对象
+     * 获取被包装的定时任务
      *
-     * @return
+     * @return 被包装的定时任务
      */
     TimerTask task();
 
     /**
      * 功能：判断是否过期
      *
-     * @return
+     * @return true or false
      */
     boolean isExpired();
 
@@ -35,14 +34,14 @@ public interface Timeout {
     /**
      * 功能：判断是否取消
      *
-     * @return
+     * @return true or false
      */
     boolean isCancelled();
 
     /**
      * 功能：取消
      *
-     * @return
+     * @return true or false
      */
     boolean cancel();
 }

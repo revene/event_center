@@ -264,9 +264,9 @@ public class EventScanWorker implements Runnable {
     }
 
     /**
-     * 功能：添加任务
+     * 将事件提交成任务
      *
-     * @param event
+     * @param event 事件
      */
     private void addTask(Event event) {
         try {

@@ -18,6 +18,8 @@ package com.blanc.event.timer.impl;
 import com.blanc.event.timer.Timeout;
 import com.blanc.event.timer.Timer;
 import com.blanc.event.timer.TimerTask;
+import com.google.common.base.Throwables;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,16 +30,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * 功能：时间轮
+ * 时间轮
  *
- * @author chuchengyi
+ * @author wangbaoliang
  */
+@Slf4j(topic = "timer")
 public class HashedWheelTimer implements Timer {
 
-    /**
-     * 功能：定义日志信息
-     */
-    private final static Logger logger = LoggerFactory.getLogger("timerLog");
 
     /**
      * 功能：全局可以定义最大实例的个数
@@ -60,7 +59,7 @@ public class HashedWheelTimer implements Timer {
     private final DispatchWorker worker = new DispatchWorker(this);
 
     /**
-     * 时间轮每格的时间间隔，默认是1
+     * 时间轮的基本时间跨度:描述了时间轮时间控制的精度
      */
     private final long tickDuration;
 
@@ -70,16 +69,14 @@ public class HashedWheelTimer implements Timer {
     private final int bucketIndexMask;
 
     /**
-     * 功能：时间轮的数据桶列表
+     * 时间轮的桶:即定时任务的列表
      */
     private final HashedWheelBucket[] bucketList;
-
 
     /**
      * 功能：时间轮的启动锁
      */
     private final CountDownLatch timerInitialLock = new CountDownLatch(1);
-
 
     /**
      * 功能：定义时间轮的数据索引
@@ -87,7 +84,7 @@ public class HashedWheelTimer implements Timer {
     private final ConcurrentHashMap<String, String> dataIndexMap = new ConcurrentHashMap<>();
 
     /**
-     * 功能：等待排队的时间轮数据
+     * 等待放入到时间轮中的HashedWheelTimerout队列缓存
      */
     private final Queue<HashedWheelTimeout> timeouts = PlatformDependent.newMpscQueue();
 
@@ -107,27 +104,24 @@ public class HashedWheelTimer implements Timer {
     private final long maxPendingTimeouts;
 
     /**
-     * 功能：时间轮的启动时间
+     * 时间轮的启动时间
      */
     private volatile long startTime;
 
     /**
-     * 功能:默认的bucket的个数 即一个时间轮有多少个格子，这里默认是512格，需要是2的n次方，用于确保hash运算的方便
+     * 默认的bucket的个数 即一个时间轮有多少个格子，这里默认是512格，需要是2的n次方，用于确保hash运算的方便
      */
     private static final int DEFAULT_BUCKET_SIZE = 512;
-
 
     /**
      * 功能：最大的bucket的个数
      */
     private static final int MAX_BUCKET_SIZE = 1073741824;
 
-
     /**
      * 功能：1ns时间常量的定义
      */
     private static final long MILLISECOND_NANOS = TimeUnit.MILLISECONDS.toNanos(1);
-
 
     /**
      * 功能：使用默认的线程池和时间片来构造一个时间轮 默认的ThreadFactory
@@ -136,9 +130,9 @@ public class HashedWheelTimer implements Timer {
         this(Executors.defaultThreadFactory());
     }
 
-
     /**
      * 使用默认的线程池和制定的事件间隔来构造一个时间轮
+     *
      * @param tickDuration
      * @param unit
      */
@@ -217,6 +211,7 @@ public class HashedWheelTimer implements Timer {
 
     /**
      * 功能：最终构造方法
+     *
      * @param threadFactory
      * @param tickDuration
      * @param unit
@@ -293,12 +288,16 @@ public class HashedWheelTimer implements Timer {
                 workerThread.start();
             }
         }
-
-        //等待启动结果
+        /**
+         * MESA模型的写法,如果发现条件不满足,则await直到别的线程asign唤醒后,继续执行,所以只要startTime为0,就阻塞当前线程
+         * 直到startTime被赋值
+         */
         while (startTime == 0) {
             try {
                 timerInitialLock.await();
             } catch (InterruptedException ignore) {
+                log.error("HashWheelTimer [timerInitialLock.await()] is error, caused by {}",
+                        Throwables.getStackTraceAsString(ignore));
             }
         }
     }
@@ -342,23 +341,24 @@ public class HashedWheelTimer implements Timer {
         if (!this.getDataIndexMap().containsKey(task.getId())) {
             //计数器，没在时间轮中添加一个事件就将count+1;
             long pendingTimeoutsCount = pendingTimeouts.incrementAndGet();
-            //todo 某种条件下会抛出Rejecct异常
+            //todo 这个pendingTimeOuts是个啥意思?
             if (maxPendingTimeouts > 0 && pendingTimeoutsCount > maxPendingTimeouts) {
                 pendingTimeouts.decrementAndGet();
                 throw new RejectedExecutionException("Number of pending timeouts ("
                         + pendingTimeoutsCount + ") is greater than or equal to maximum allowed pending "
                         + "timeouts (" + maxPendingTimeouts + ")");
             }
-            //触发启动
+            //时间轮在构造的时候并没有启动,而这里是启动了时间轮
             start();
-            //获取到绝对的生命周期时间 获取纳秒
+            //计算该任务的相对时间轮启动时间的偏移时间,单位是纳秒
             long deadline = System.nanoTime() + unit.toNanos(delay) - startTime;
-            //线程时间已经过期很久了
+            //todo 这里是什么意思?
             if (delay > 0 && deadline < 0) {
                 deadline = Long.MAX_VALUE;
             }
-            //沟通时间片插入到排队队列
+            //将TimerTask包装成HashedWheelTimerout(时间轮的定时任务基本单位)
             HashedWheelTimeout timeout = new HashedWheelTimeout(this, task, deadline);
+            //添加到timeouts的缓存队列中,随后再真的放入到时间轮中去执行
             timeouts.add(timeout);
             this.dataIndexMap.put(task.getId(), task.getId());
             return timeout;
@@ -377,7 +377,7 @@ public class HashedWheelTimer implements Timer {
 
     private static void reportTooManyInstances() {
         String resourceType = PlatformDependent.simpleClassName(HashedWheelTimer.class);
-        logger.error("You are creating too many " + resourceType + " instances. " +
+        log.error("You are creating too many " + resourceType + " instances. " +
                 resourceType + " is a shared resource that must be reused across the JVM," +
                 "so that only a few instances are created.");
 

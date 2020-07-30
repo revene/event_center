@@ -102,7 +102,7 @@ public class EventScanServiceImpl implements EventScanService {
             EventTimerTask task = new EventTimerTask();
             //当数据执行时间已经过期化 300ms内执行
             long delay = event.getExecuteTime() - System.currentTimeMillis();
-            //如果执行时间在当前时间之前，说明这个已经过期了，设置delay为300ms
+            //如果执行时间在当前时间之前，说明这个已经过期了，早就应该执行了却没有执行, 设置delay为300ms
             if (delay < 0) {
                 delay = DEFAULT_DELAY_TIME;
             }
@@ -151,7 +151,7 @@ public class EventScanServiceImpl implements EventScanService {
                 //将数据节点放到工作线程的缓存中
                 workerMap.put(node.getId(), worker);
                 //线程池中开始执行worker的扫描任务
-//                threadPool.submit(worker);
+                threadPool.submit(worker);
             }
             result.success();
         } catch (Throwable throwable) {
