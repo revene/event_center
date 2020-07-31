@@ -2,6 +2,7 @@ package com.blanc.event.timer.impl;
 
 import com.blanc.event.timer.Timeout;
 import com.blanc.event.timer.WorkerStatus;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Collections;
@@ -14,6 +15,7 @@ import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
  *
  * @author blanc
  */
+@Data
 @Slf4j(topic = "timer")
 public class DispatchWorker implements Runnable {
 
@@ -262,12 +264,6 @@ public class DispatchWorker implements Runnable {
         return Collections.unmodifiableSet(unprocessedTimeouts);
     }
 
-    public int getWorkerState() {
-        return workerState;
-    }
 
-    public void setWorkerState(int workerState) {
-        this.workerState = workerState;
-    }
 }
 
