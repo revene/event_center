@@ -4,18 +4,17 @@ import com.blanc.event.model.Event;
 import com.blanc.event.model.EventResult;
 
 /**
- * 功能：消费服务信息
+ * 普通事件执行器
  *
- * @author chuchengyi
+ * @author wangbaoliang
  */
-public interface EventConsumerService  extends ConsumerService{
-
+public interface EventConsumerService extends ConsumerService {
 
     /**
-     * 功能：小费事件消息
+     * 消费执行event
      *
-     * @param event
-     * @return
+     * @param event 事件
+     * @return 消费结果
      */
-    public EventResult consumerEvent(Event event);
+    EventResult consumerEvent(Event event);
 }

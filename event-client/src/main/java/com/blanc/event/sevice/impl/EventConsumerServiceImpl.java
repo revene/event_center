@@ -9,9 +9,9 @@ import com.blanc.event.sevice.EventConsumerService;
 import java.util.Date;
 
 /**
- * 功能：事件处理服务的实现
+ * 事件处理
  *
- * @author chuchengyi
+ * @author wangbaoliang
  */
 public class EventConsumerServiceImpl extends AbstractEventConsumerService implements EventConsumerService {
 
@@ -19,8 +19,7 @@ public class EventConsumerServiceImpl extends AbstractEventConsumerService imple
     @Override
     public EventResult consumerEvent(Event event) {
         EventResult result = new EventResult();
-
-        Date startTime = new Date();
+        Date currentDate = new Date();
         try {
             //设置执行的ip信息
             result.setClientIp(address.getHostAddress());
@@ -30,9 +29,7 @@ public class EventConsumerServiceImpl extends AbstractEventConsumerService imple
             if (this.listenerMap.containsKey(eventType)) {
                 EventConsumerListener listener = this.listenerMap.get(eventType);
                 result = listener.consumerEvent(event);
-            }
-            //当没有事件处理器
-            else {
+            } else {
                 result.setSuccess(false);
                 result.setErrorMessage("no Listener ");
             }
@@ -41,7 +38,7 @@ public class EventConsumerServiceImpl extends AbstractEventConsumerService imple
         } finally {
             Date endTime = new Date();
             //设置开始时间
-            result.setStartExecute(startTime);
+            result.setStartExecute(currentDate);
             //设置结束时间
             result.setEndExecute(endTime);
 

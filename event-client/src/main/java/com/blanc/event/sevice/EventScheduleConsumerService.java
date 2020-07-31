@@ -4,9 +4,9 @@ import com.blanc.event.model.Event;
 import com.blanc.event.model.EventResult;
 
 /**
- * 功能：专门为定时任务去设计的解决是长时间定时任务的接口
+ * 消费定时任务类型的event
  *
- * @author chuchengyi
+ * @author wangbaoliang
  */
 public interface EventScheduleConsumerService extends ConsumerService {
 
@@ -16,23 +16,22 @@ public interface EventScheduleConsumerService extends ConsumerService {
      *
      * @return
      */
-    public EventPublishService getEventPublishService();
+    EventPublishService getEventPublishService();
 
     /**
      * 功能：设置事件发布服务
      *
      * @param eventPublishService
      */
-    public void setEventPublishService(EventPublishService eventPublishService);
+    void setEventPublishService(EventPublishService eventPublishService);
 
     /**
      * 功能：消费事件消息
      *
-     * @param event
-     * @return
+     * @param event 要消费的事件
+     * @return 消费事件的结果
      */
-    public EventResult consumerScheduleEvent(Event event);
-
+    EventResult consumerScheduleEvent(Event event);
 
 
 }

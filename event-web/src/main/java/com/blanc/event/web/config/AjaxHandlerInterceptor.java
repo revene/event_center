@@ -14,7 +14,9 @@ import java.util.List;
 
 
 /**
- * @author chuchengyi
+ * ajax请求配置
+ *
+ * @author wangbaoliang
  */
 @Configuration
 public class AjaxHandlerInterceptor implements WebMvcConfigurer {
@@ -54,14 +56,17 @@ public class AjaxHandlerInterceptor implements WebMvcConfigurer {
 
     }
 
+    /**
+     * 跨域请求的配置
+     *
+     * @param registry cors注册器
+     */
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedMethods("*")
-                .allowedOrigins("https://system.ypshengxian.com", "https://app-center.ypshengxian.com"
-                ,"http://test-app-center.ypsx-internal.com","http://dev-app-center.ypsx-internal.com")
+                .allowedOrigins("https://www.test1.com", "https://www.test2.com")
                 .allowCredentials(true);
-
     }
 
     @Override

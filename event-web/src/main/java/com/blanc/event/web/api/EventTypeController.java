@@ -9,6 +9,7 @@ import com.blanc.event.model.EventType;
 import com.blanc.event.web.vo.EventTypeVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.dozer.DozerBeanMapperBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,29 +26,29 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * 事件类型web端
+ * 事件类型管理
  *
  * @author wangbaoliang
  */
+@Api(tags = "事件类型管理")
+@Slf4j(topic = "eventLog")
 @Controller
 @RequestMapping(value = "eventType")
-@Api(description = "事件类型管理接口", tags = "事件类型管理")
-public class EventTypeApi {
-
+public class EventTypeController {
 
     @Resource
     private EventTypeManager eventTypeManager;
 
     /**
-     * 功能：定义日志打印信息
+     * 添加一个时间类型
+     *
+     * @param eventTypeVO 要添加的事件
+     * @return true or false
      */
-    private final static Logger logger = LoggerFactory.getLogger("eventLog");
-
-    @ResponseBody
     @ApiOperation("添加事件类型")
     @RequestMapping(value = "add", method = RequestMethod.POST)
-    public Result<Boolean> add(@RequestBody EventTypeRequest eventTypeVO) throws Exception {
-        Result<Boolean> result = new Result<>();
+    public Result add(@RequestBody EventTypeRequest eventTypeVO) {
+        Result result = new Result<>();
         try {
             EventType eventType = new EventType();
             BeanUtils.copyProperties(eventTypeVO, eventType);
@@ -57,49 +58,66 @@ public class EventTypeApi {
             result = eventTypeManager.saveEventType(eventType);
         } catch (Throwable throwable) {
             result.fail(Throwables.getStackTraceAsString(throwable));
-            logger.error("EventTypeApi[add] is error" + throwable.getMessage());
-
+            log.error("EventTypeController[add] is error, caused by {}, param is {}",
+                    Throwables.getStackTraceAsString(throwable),
+                    eventTypeVO);
         }
         return result;
     }
 
-
-    @ResponseBody
+    /**
+     * 激活一个事件
+     *
+     * @param eventTypeVO 要激活的事件
+     * @return true or false
+     */
     @ApiOperation("激活事件类型")
     @RequestMapping(value = "active", method = RequestMethod.POST)
-    public Result<Boolean> active(@RequestBody EventTypeRequest eventTypeVO) throws Exception {
-        Result<Boolean> result = new Result<>();
+    public Result active(@RequestBody EventTypeRequest eventTypeVO) {
+        Result result = new Result<>();
         try {
             Long eventTypeId = eventTypeVO.getId();
             result = eventTypeManager.activeEventType(eventTypeId);
         } catch (Throwable throwable) {
             result.fail(Throwables.getStackTraceAsString(throwable));
-            logger.error("EventTypeApi[active] is error" + throwable.getMessage());
+            log.error("EventTypeController[active] is error, caused by {}, param is {}",
+                    Throwables.getStackTraceAsString(throwable),
+                    eventTypeVO);
         }
         return result;
     }
 
-
-    @ResponseBody
+    /**
+     * 更新事件类型
+     *
+     * @param eventTypeVO 要更新的事件
+     * @return true or false
+     */
     @ApiOperation("添加事件类型")
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    public Result<Boolean> update(@RequestBody EventTypeUpdateRequest eventTypeVO) throws Exception {
-        Result<Boolean> result = new Result<>();
+    public Result update(@RequestBody EventTypeUpdateRequest eventTypeVO) {
+        Result result = new Result<>();
         try {
             EventType updateEventType = DozerBeanMapperBuilder.buildDefault().map(eventTypeVO, EventType.class);
             result = eventTypeManager.updateEventType(updateEventType);
         } catch (Throwable throwable) {
             result.fail(Throwables.getStackTraceAsString(throwable));
-            logger.error("EventTypeApi[update] is error" + throwable.getMessage());
+            log.error("EventTypeController[update] is error, causedy by {}, param is {}",
+                    Throwables.getStackTraceAsString(throwable),
+                    eventTypeVO);
         }
         return result;
     }
 
-
-    @ResponseBody
+    /**
+     * 查询所有事件类型
+     *
+     * @param request 查询请求参数
+     * @return 事件类型列表
+     */
     @ApiOperation("查询事件类型")
     @RequestMapping(value = "list", method = RequestMethod.POST)
-    public Result<List<EventTypeVO>> list(@RequestBody EventTypeRequest request) throws Exception {
+    public Result<List<EventTypeVO>> list(@RequestBody EventTypeRequest request) {
         Result<List<EventTypeVO>> result = new Result<>();
         try {
             List<EventTypeVO> resultDataList = new ArrayList<>();
@@ -116,10 +134,10 @@ public class EventTypeApi {
             }
         } catch (Throwable throwable) {
             result.fail(Throwables.getStackTraceAsString(throwable));
-            logger.error("EventTypeApi[list] is error" + throwable.getMessage());
-
+            log.error("EventTypeController[list] is error, caused by {}, param is {}",
+                    Throwables.getStackTraceAsString(throwable),
+                    request);
         }
         return result;
-
     }
 }

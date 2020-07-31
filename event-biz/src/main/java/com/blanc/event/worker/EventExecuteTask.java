@@ -6,61 +6,53 @@ import com.blanc.event.model.Event;
 import com.blanc.event.sevice.ConsumerService;
 import com.blanc.event.sevice.EventConsumerService;
 import com.blanc.event.sevice.EventScheduleConsumerService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.google.common.base.Throwables;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StopWatch;
 
 import java.io.Serializable;
 
 /**
- * 功能：任务执行的单元
+ * 包装event, event的真实执行单元, Runnable接口
  *
- * @author chuchengyi
+ * @author wangbaoliang
  */
+@Data
+@Slf4j(topic = "eventLog")
 public class EventExecuteTask implements Runnable, Serializable {
 
     private static final long serialVersionUID = -2437588070685164104L;
-
 
     /**
      * 功能：设置执行过程是否需要监控
      */
     private boolean monitor;
+
     /**
-     * 功能：事件的数据信息
+     * 待执行的event事件
      */
     private Event event;
 
     /**
-     * 功能：事件的执行服务
+     * 事件的类型,EventConsumerService or EventScheduleConsumerService
      */
     private ConsumerService service;
 
-
     /**
-     * 功能：事件执行的缓存
+     * 事件执行的缓存
      */
     private EventExecuteCache eventExecuteCache;
 
     /**
-     * 功能：事件执行成功的缓存
+     * 事件执行成功的缓存
      */
     private EventExecuteResultCache eventExecuteResultCache;
 
     /**
-     * 功能：用来进行系统检测
+     * 用来进行系统检测
      */
     private StopWatch stopWatch;
-
-    /**
-     * 功能：定义日志信息
-     */
-    private final static Logger logger = LoggerFactory.getLogger("eventLog");
-
-    public EventExecuteTask() {
-
-    }
-
 
     /**
      * 功能：构造任务执行的单元
@@ -69,7 +61,6 @@ public class EventExecuteTask implements Runnable, Serializable {
      * @param service
      * @param eventExecuteCache
      */
-
     public EventExecuteTask(Event event, ConsumerService service, EventExecuteCache eventExecuteCache, EventExecuteResultCache eventExecuteResultCache) {
         this.event = event;
         this.service = service;
@@ -116,7 +107,7 @@ public class EventExecuteTask implements Runnable, Serializable {
                 endMonitor();
             }
         } catch (Throwable throwable) {
-            logger.error("EventExecuteTask[runs] is error bizId=" + event.getBizId(), throwable);
+            log.error("EventExecuteTask[runs] is error bizId=" + event.getBizId(), throwable);
         }
 
     }
@@ -138,47 +129,33 @@ public class EventExecuteTask implements Runnable, Serializable {
         if (this.monitor) {
             stopWatch.stop();
             String threadName = Thread.currentThread().getName();
-            logger.error(threadName + " id=" + event.getBizId() + " cost=" + stopWatch.getLastTaskTimeMillis());
+            log.error(threadName + " id=" + event.getBizId() + " cost=" + stopWatch.getLastTaskTimeMillis());
         }
     }
 
-
     /**
-     * 功能：执行具体的任务信息
+     * 执行具体的事件
      *
-     * @param event
+     * @param event 待执行的事件
      */
     private void executeEvent(Event event) {
         try {
-            //功能：获取执行的服务信息
+            //如果是普通事件
             if (service instanceof EventConsumerService) {
                 EventConsumerService consumerService = (EventConsumerService) service;
                 //立刻执行
                 consumerService.consumerEvent(event);
             }
+            //如果是定时事件
             if (service instanceof EventScheduleConsumerService) {
                 EventScheduleConsumerService consumerService = (EventScheduleConsumerService) service;
                 //立刻执行
                 consumerService.consumerScheduleEvent(event);
             }
         } catch (Throwable throwable) {
-            logger.error("EventExecuteTask[executeEvent]  is error event:" + event.toString(), throwable);
+            log.error("EventExecuteTask[executeEvent]  is error,caused by {}, event is {}",
+                    Throwables.getStackTraceAsString(throwable),
+                    event);
         }
-    }
-
-    public Event getEvent() {
-        return event;
-    }
-
-    public void setEvent(Event event) {
-        this.event = event;
-    }
-
-    public ConsumerService getService() {
-        return service;
-    }
-
-    public void setService(EventConsumerService service) {
-        this.service = service;
     }
 }

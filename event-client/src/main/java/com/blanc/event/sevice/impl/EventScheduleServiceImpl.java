@@ -14,18 +14,16 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 /**
- * 功能：定时任务的事件触发类
+ * 定时任务的执行实现类
  *
- * @author chuchengyi
+ * @author wangbaoliang
  */
-public class EventScheduleServiceImpl extends AbstractEventConsumerService implements EventScheduleConsumerService{
-
+public class EventScheduleServiceImpl extends AbstractEventConsumerService implements EventScheduleConsumerService {
 
     /**
      * 功能：停止当前线程
      */
     private Thread workerThread;
-
 
     /**
      * 功能：线程执行情况
@@ -42,7 +40,9 @@ public class EventScheduleServiceImpl extends AbstractEventConsumerService imple
      */
     private ScheduleEventExecuteCache eventExecuteCache = ScheduleEventExecuteCache.getInstance();
 
-
+    /**
+     * 无参构造器
+     */
     public EventScheduleServiceImpl() {
 
     }
@@ -61,8 +61,8 @@ public class EventScheduleServiceImpl extends AbstractEventConsumerService imple
     @Override
     public EventResult consumerScheduleEvent(Event event) {
         EventResult result = new EventResult();
-        //startTime 为当前时间
-        Date startTime = new Date();
+        //currentDate 为当前时间
+        Date currentDate = new Date();
         try {
             //获取事件类
             String eventType = event.getEventType();
@@ -86,7 +86,7 @@ public class EventScheduleServiceImpl extends AbstractEventConsumerService imple
         } finally {
             Date endTime = new Date();
             //设置开始时间
-            result.setStartExecute(startTime);
+            result.setStartExecute(currentDate);
             //设置结束时间
             result.setEndExecute(endTime);
             //将处理的结果返回给数据

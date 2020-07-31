@@ -1,21 +1,25 @@
 package com.blanc.event.web.vo;
 
-import com.alibaba.fastjson.JSON;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.blanc.event.model.EventChanel;
 import com.blanc.event.model.EventStatus;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 
 /**
- * @author chuchengyi
+ * 事件VO对象
  */
+@Data
+@ToString
 public class EventVO implements Serializable {
 
     private static final long serialVersionUID = -1774995205442532208L;
+
     /**
      * 功能:数据ID
      */
@@ -124,139 +128,5 @@ public class EventVO implements Serializable {
      * 功能：数据索引信息
      */
     private Long dataIndex;
-
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
-    public Long getExecuteSize() {
-        return executeSize;
-    }
-
-    public void setExecuteSize(Long executeSize) {
-        this.executeSize = executeSize;
-    }
-
-    public Date getGmtCreate() {
-        return gmtCreate;
-    }
-
-    public void setGmtCreate(Date gmtCreate) {
-        this.gmtCreate = gmtCreate;
-    }
-
-    public Date getGmtModify() {
-        return gmtModify;
-    }
-
-    public void setGmtModify(Date gmtModify) {
-        this.gmtModify = gmtModify;
-    }
-
-    public Long getExecuteTime() {
-        return executeTime;
-    }
-
-    public void setExecuteTime(Long executeTime) {
-        this.executeTime = executeTime;
-    }
-
-    public String getAppCode() {
-        return appCode;
-    }
-
-    public void setAppCode(String appCode) {
-        this.appCode = appCode;
-    }
-
-    public String getEventType() {
-        return eventType;
-    }
-
-    public void setEventType(String eventType) {
-        this.eventType = eventType;
-    }
-
-    public String getBizId() {
-        return bizId;
-    }
-
-    public void setBizId(String bizId) {
-        this.bizId = bizId;
-    }
-
-    public Long getVersion() {
-        return version;
-    }
-
-    public void setVersion(Long version) {
-        this.version = version;
-    }
-
-    public String getTargetIp() {
-        return targetIp;
-    }
-
-    public void setTargetIp(String targetIp) {
-        this.targetIp = targetIp;
-    }
-
-    public String getPublishChanel() {
-        return publishChanel;
-    }
-
-    public void setPublishChanel(String publishChanel) {
-        this.publishChanel = publishChanel;
-    }
-
-    public String getReceiveChanel() {
-        return receiveChanel;
-    }
-
-    public void setReceiveChanel(String receiveChanel) {
-        this.receiveChanel = receiveChanel;
-    }
-
-    public Map<String, String> getParam() {
-        return param;
-    }
-
-    public void setParam(Map<String, String> param) {
-        this.param = param;
-    }
-
-    public String getRequest() {
-        return request;
-    }
-
-    public void setRequest(String request) {
-        this.request = request;
-    }
-
-    public Long getDataIndex() {
-        return dataIndex;
-    }
-
-    public void setDataIndex(Long dataIndex) {
-        this.dataIndex = dataIndex;
-    }
-
-    @Override
-    public String toString() {
-        return JSON.toJSONString(this);
-    }
 
 }

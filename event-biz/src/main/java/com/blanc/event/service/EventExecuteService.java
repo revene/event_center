@@ -5,16 +5,16 @@ import com.blanc.event.model.Event;
 import com.blanc.event.sevice.ConsumerService;
 
 /**
- * 功能：事件执行服务
+ * 时间执行服务
  *
- * @author chuchengyi
+ * @author wangbaoliang
  */
 public interface EventExecuteService {
 
     /**
      * 功能：初始化化服务只有在系统初始化的时候调用
      */
-    public void initService();
+    void initService();
 
 
     /**
@@ -23,23 +23,23 @@ public interface EventExecuteService {
      * @param event
      * @return
      */
-    public ConsumerService getService(Event event);
+    ConsumerService getService(Event event);
 
 
     /**
-     * 功能：直接执行
+     * 直接执行event
      *
-     * @param event
-     * @return
+     * @param event 待执行事件
+     * @return 执行result
      */
-    public Result executeEvent(Event event);
+    Result executeEvent(Event event);
 
 
     /**
-     * 功能：提交到线程池执行
+     * 提交到线程池执行event
      *
-     * @param event
-     * @return
+     * @param event 待执行事件
+     * @return 执行result
      */
-    public Result submitEvent(Event event);
+    Result submitEvent(Event event);
 }

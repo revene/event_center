@@ -4,7 +4,6 @@ import com.blanc.event.cache.EventExecuteCache;
 import com.blanc.event.cache.EventExecuteResultCache;
 import com.blanc.event.cache.EventTypeCache;
 import com.blanc.event.cache.ExecuteServiceCache;
-import com.blanc.event.manager.EventManager;
 import com.blanc.event.manager.EventTypeManager;
 import com.blanc.event.model.Event;
 import com.blanc.event.model.EventType;
@@ -15,8 +14,7 @@ import com.blanc.event.sevice.ConsumerService;
 import com.blanc.event.worker.EventExecuteTask;
 import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -26,25 +24,20 @@ import java.util.List;
 import java.util.concurrent.*;
 
 /**
- * @author chuchengyi
+ * 时间执行服务
+ *
+ * @author wangbaoliang
  */
-
+@Slf4j(topic = "eventLog")
 @Component
 public class EventExecuteServiceImpl implements EventExecuteService, InitializingBean {
 
-
     @Resource
     private EventTypeManager eventTypeManager;
-
-    @Resource
-    private EventManager eventManager;
-
     @Resource
     private EventExecuteCache eventExecuteCache;
-
     @Resource
     private EventExecuteResultCache eventExecuteResultCache;
-
     @Resource
     private ConsumerServiceFactory consumerServiceFactory;
 
@@ -64,37 +57,17 @@ public class EventExecuteServiceImpl implements EventExecuteService, Initializin
      * 功能：线程初始化时间
      */
     private static final long KEEP_LIVE_TIME = 0;
+
     /**
      * 功能：线程池
      */
     private ExecutorService threadPool;
 
-    /**
-     * 功能：事件类型的缓存信息
-     */
-    private EventTypeCache eventTypeCache = EventTypeCache.getInstance();
-
-    /**
-     * 功能：执行服务的缓存
-     */
-    private ExecuteServiceCache executeServiceCache = ExecuteServiceCache.getInstance();
-
-
-    /**
-     * 功能：定义日志信息
-     */
-    private final static Logger logger = LoggerFactory.getLogger("eventLog");
-
-
-    public EventExecuteServiceImpl() {
-
-    }
-
 
     @Override
     public void afterPropertiesSet() throws Exception {
         try {
-            //设置一个派对队列
+            //设置一个无界队列
             LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue(Integer.MAX_VALUE);
             //设置线程工厂
             ThreadFactory factory = new ThreadFactoryBuilder().setNameFormat("event execute Thread -%d").build();
@@ -102,7 +75,7 @@ public class EventExecuteServiceImpl implements EventExecuteService, Initializin
             this.threadPool = new ThreadPoolExecutor(minThreadSize, maxThreadSize, KEEP_LIVE_TIME,
                     TimeUnit.MILLISECONDS, queue, factory);
         } catch (Throwable throwable) {
-            logger.error("EventExecuteServiceImpl[init] is error:" + throwable.getMessage());
+            log.error("EventExecuteServiceImpl[init] is error:" + throwable.getMessage());
         }
 
     }
@@ -149,7 +122,7 @@ public class EventExecuteServiceImpl implements EventExecuteService, Initializin
             }
         } catch (Throwable throwable) {
             executeResult.fail(Throwables.getStackTraceAsString(throwable));
-            logger.error("EventExecuteServiceImpl[executeEvent]  is error event:" + event.toString(), throwable);
+            log.error("EventExecuteServiceImpl[executeEvent]  is error event:" + event.toString(), throwable);
 
         }
         return executeResult;
@@ -171,27 +144,13 @@ public class EventExecuteServiceImpl implements EventExecuteService, Initializin
             } else {
                 executeResult.fail("NO SERVICE PROVIDER");
             }
-
         } catch (Throwable throwable) {
             executeResult.fail(Throwables.getStackTraceAsString(throwable));
-            logger.error("EventExecuteServiceImpl[submitEvent]  is error event:" + event.toString(), throwable);
+            log.error("EventExecuteServiceImpl[submitEvent]  is error, caused by {}, event is {}",
+                    Throwables.getStackTraceAsString(throwable),
+                    event);
         }
         return executeResult;
     }
 
-    public int getMinThreadSize() {
-        return minThreadSize;
-    }
-
-    public void setMinThreadSize(int minThreadSize) {
-        this.minThreadSize = minThreadSize;
-    }
-
-    public int getMaxThreadSize() {
-        return maxThreadSize;
-    }
-
-    public void setMaxThreadSize(int maxThreadSize) {
-        this.maxThreadSize = maxThreadSize;
-    }
 }
