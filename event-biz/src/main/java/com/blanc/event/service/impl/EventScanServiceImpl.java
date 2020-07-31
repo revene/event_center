@@ -70,7 +70,7 @@ public class EventScanServiceImpl implements EventScanService {
     private Map<Long, EventScanWorker> workerMap = new ConcurrentHashMap<>();
 
     /**
-     * 功能：设置时间轮
+     * 初始化时间轮
      */
     private final Timer timer = new HashedWheelTimer();
 
