@@ -3,8 +3,6 @@ package com.blanc.event.timer.impl;
 import com.blanc.event.timer.Timeout;
 import com.blanc.event.timer.WorkerStatus;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -112,20 +110,22 @@ public class DispatchWorker implements Runnable {
         }
         //给时间轮设置启动时间
         timer.setStartTime(startTime);
-        /**
-         * 释放启动锁,通过CountDownLatch保证只有一个线程完成此操作
-         * 因为时间轮的启动是第一个时间轮的任务放入的时候去启动的,所以会有并发的问题
-         */
+        //释放启动锁,此时时间轮的第一个newTimerout做启动时间轮的线程得以继续执行,因为没有setStartTime之前计算不了deadLine,所以要等设置好startTime后继续执行
         timer.getTimerInitialLock().countDown();
         int startStatus = WorkerStatus.STARTED.getStatus();
         while (WORKER_STATE_UPDATER.get(DispatchWorker.this) == startStatus) {
-            //计算并休眠到下一个tick,deadline是当前时间和startTime的便宜
+            //休眠到下一个tick,并返回deadline: 当前时间和startTime的偏移
             final long deadline = waitForNextTick();
             if (deadline > 0) {
+                //计算当前tick所在的槽位,因为tick是递增的一圈一圈转,比如槽位是8个,tick = 9,则 9 & 7 = 1,还是在第一个槽位上
                 int idx = (int) (tick & timer.getBucketIndexMask());
+                //从timerout缓存队列中取出要取消的任务
                 processCancelledTask();
+                //拿到当前tick对应的hashedWheelBucket
                 HashedWheelBucket bucket = timer.getBucketList()[idx];
+                //将Timerout缓存队列中的任务真正的放置到时间轮中
                 dispatchTimeoutsToBuckets();
+                //弹出当前的bucket中的任务,并且执行应该要执行的任务
                 bucket.expireTimeouts(deadline);
                 tick++;
             }
@@ -145,9 +145,9 @@ public class DispatchWorker implements Runnable {
         for (HashedWheelBucket bucket : timer.getBucketList()) {
             bucket.clearTimeouts(unprocessedTimeouts);
         }
-        //移除排队队列中的数据
+        //移除排队队列中的数据,放入到未处理的队列中
         while (true) {
-            HashedWheelTimeout timeout = timer.getTimeouts().poll();
+            HashedWheelTimeout timeout = timer.getTimeoutsCache().poll();
             if (timeout == null) {
                 break;
             }
@@ -159,19 +159,25 @@ public class DispatchWorker implements Runnable {
     }
 
     /**
-     * 功能：讲队列中的数据移到bucket中
+     * 将Timerout缓存队列中的任务真正的放置到时间轮中
      */
     private void dispatchTimeoutsToBuckets() {
+        //写死的循环100000次
         for (int i = 0; i < DISPATCH_SIZE; i++) {
-            HashedWheelTimeout timeout = timer.getTimeouts().poll();
+            HashedWheelTimeout timeout = timer.getTimeoutsCache().poll();
+            //如果取完了,直接退出
             if (timeout == null) {
                 break;
             }
+            //如果状态是cancel,直接跳过
             if (timeout.state() == HashedWheelTimeout.ST_CANCELLED) {
                 continue;
             }
+            //与时间轮的起始时间偏移 / 时间轮的时间精度,计算出应该放在哪个格子的桶内
             long calculated = timeout.deadline / timer.getTickDuration();
+            //计算出round轮数, 时间轮每转一圈, 则round - 1, round == 0的时候才执行
             timeout.setRemainingRounds((calculated - tick) / timer.getBucketList().length);
+            //计算应该放在哪个ticks里
             final long ticks = Math.max(calculated, tick);
             int stopIndex = (int) (ticks & timer.getBucketIndexMask());
             HashedWheelBucket bucket = timer.getBucketList()[stopIndex];
@@ -180,7 +186,7 @@ public class DispatchWorker implements Runnable {
     }
 
     /**
-     * 功能：设置取消的任务队列
+     * 要取消的任务的处理
      */
     private void processCancelledTask() {
         while (true) {
@@ -197,19 +203,19 @@ public class DispatchWorker implements Runnable {
     }
 
     /**
-     * 功能：等待到下一个时间轮的触发时间
+     * 功能：等待到下一个时间轮的格子的触发时间
      *
-     * @return
+     * @return 睡眠到下个tick的执行时间后, 返回当前时间和startTime的偏移, 如果睡过头了呢?
      */
     private long waitForNextTick() {
-        //计算下个tick的deadline和startTime的偏移总量
+        //计算下个tick的deadline和startTime的偏移总量,tick初始化从0开始
         long deadline = timer.getTickDuration() * (tick + 1);
         while (true) {
             //获取当前时间和startTime的偏移
             final long currentTime = System.nanoTime() - startTime;
-            //计算距离下次tick应该休眠的时间,/1000000是为了转换成毫秒,为了sleep准备(sleep只能以毫秒为单位)
+            //计算距离下次tick应该休眠的时间(单位为毫秒),/1000000是为了转换成毫秒,为了sleep准备(sleep只能以毫秒为单位)
             long sleepTimeMs = (deadline - currentTime + 999999) / 1000000;
-            //不需要睡眠直接返回
+            //如果当前时间已经超过了deadline,不需要睡眠直接返回当前的时间偏移
             if (sleepTimeMs <= 0) {
                 if (currentTime == Long.MIN_VALUE) {
                     return -Long.MAX_VALUE;

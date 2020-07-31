@@ -24,11 +24,13 @@ public class HashedWheelBucket {
     /**
      * 功能：构造一个时间轮数据对象放到数据桶中
      *
-     * @param timeout
+     * @param timeout 时间轮中的定时任务
      */
     public void addTimeout(HashedWheelTimeout timeout) {
+        //声明这个任务还没有加入到bucket中
         assert timeout.bucket == null;
         timeout.bucket = this;
+        //就是往链表的后面加一下
         if (head == null) {
             head = tail = timeout;
         } else {
@@ -46,10 +48,11 @@ public class HashedWheelBucket {
      */
     public void expireTimeouts(long deadline) {
         HashedWheelTimeout timeout = head;
-
+        //遍历整个bucket链表
         while (timeout != null) {
             HashedWheelTimeout next = timeout.next;
             if (timeout.getRemainingRounds() <= 0) {
+                //移除当前的任务,并且链表指针指向下一个元素
                 next = remove(timeout);
                 if (timeout.deadline <= deadline) {
                     timeout.expire();
@@ -59,6 +62,7 @@ public class HashedWheelBucket {
             } else if (timeout.isCancelled()) {
                 next = remove(timeout);
             } else {
+                //如果当前的round > 0,则转到一次说明要将round - 1
                 long nextRemainingRounds = timeout.getRemainingRounds() - 1;
                 timeout.setRemainingRounds(nextRemainingRounds);
             }
@@ -98,14 +102,15 @@ public class HashedWheelBucket {
         timeout.prev = null;
         timeout.next = null;
         timeout.bucket = null;
+        //这里的计数器控制了整个时间轮(包括在时间轮中的和缓存列表中)的任务的数量
         timeout.timer.pendingTimeouts.decrementAndGet();
         return next;
     }
 
     /**
-     * 功能 清除一个木桶信息
+     * 处理剩余没有处理的任务
      *
-     * @param set
+     * @param set 没有处理的任务的Set
      */
     public void clearTimeouts(Set<Timeout> set) {
         while (true) {

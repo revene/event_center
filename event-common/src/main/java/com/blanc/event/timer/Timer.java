@@ -26,17 +26,21 @@ import java.util.concurrent.TimeUnit;
 public interface Timer {
 
     /**
-     * 将一个timerTask定时任务加入到时间轮中
+     * 将一个timerTask定时任务加入到时间轮中,如果是第一个任务,则启动时间轮
      *
      * @param task  封装的定时任务
      * @param delay 延迟执行时间
+     *              比如希望在时间戳100执行,但是现在的时间戳是70,则delay是30
+     *              如果希望在时间戳100执行,但是现在的时间戳是120,则delay上游给的是默认的300ms
      * @param unit  延迟执行事件单位
      * @return 时间轮执行单位
      */
     Timeout newTimeout(TimerTask task, long delay, TimeUnit unit);
 
     /**
-     * @return
+     * 停止时间轮
+     *
+     * @return 还未处理的Timerout任务
      */
     Set<Timeout> stop();
 }

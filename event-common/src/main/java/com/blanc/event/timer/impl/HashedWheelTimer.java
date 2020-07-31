@@ -74,7 +74,7 @@ public class HashedWheelTimer implements Timer {
     private final HashedWheelBucket[] bucketList;
 
     /**
-     * 功能：时间轮的启动锁
+     * 时间轮的启动锁,本质上是countDownLatch
      */
     private final CountDownLatch timerInitialLock = new CountDownLatch(1);
 
@@ -86,7 +86,7 @@ public class HashedWheelTimer implements Timer {
     /**
      * 等待放入到时间轮中的HashedWheelTimerout队列缓存
      */
-    private final Queue<HashedWheelTimeout> timeouts = PlatformDependent.newMpscQueue();
+    private final Queue<HashedWheelTimeout> timeoutsCache = PlatformDependent.newMpscQueue();
 
     /**
      * 功能：取消的时间轮数据
@@ -271,10 +271,6 @@ public class HashedWheelTimer implements Timer {
                 workerThread.start();
             }
         }
-        /**
-         * MESA模型的写法,如果发现条件不满足,则await直到别的线程asign唤醒后,继续执行,所以只要startTime为0,就阻塞当前线程
-         * 直到startTime被赋值
-         */
         while (startTime == 0) {
             try {
                 timerInitialLock.await();
@@ -285,7 +281,11 @@ public class HashedWheelTimer implements Timer {
         }
     }
 
-
+    /**
+     * 停止时间轮
+     *
+     * @return 还未处理的Timerout任务
+     */
     @Override
     public Set<Timeout> stop() {
         //当前线程不是工作线程不能停止 确保线程安全性
@@ -317,12 +317,19 @@ public class HashedWheelTimer implements Timer {
         return dispatchWorker.unprocessedTimeouts();
     }
 
-
+    /**
+     * 将一个timerTask定时任务加入到时间轮中,如果是第一个任务,则启动时间轮
+     *
+     * @param task  封装的定时任务
+     * @param delay 延迟执行时间
+     * @param unit  延迟执行事件单位
+     * @return 时间轮执行单位
+     */
     @Override
     public Timeout newTimeout(TimerTask task, long delay, TimeUnit unit) {
         //当缓存中不包含任务的时间才添加 Key是event的主键id
         if (!this.getDataIndexMap().containsKey(task.getId())) {
-            //timerout缓存队列计数器 + 1, 不能 > 限定的最大的数量
+            //timerout缓存队列计数器 + 1, 不能 > 限定的最大的数量,超过则抛出reject异常
             long pendingTimeoutsCount = pendingTimeouts.incrementAndGet();
             if (maxPendingTimeouts > 0 && pendingTimeoutsCount > maxPendingTimeouts) {
                 pendingTimeouts.decrementAndGet();
@@ -334,14 +341,15 @@ public class HashedWheelTimer implements Timer {
             start();
             //计算该任务的相对时间轮启动时间的偏移时间,单位是纳秒
             long deadline = System.nanoTime() + unit.toNanos(delay) - startTime;
-            //todo 这里是什么意思?
+            //delay上游一定是 >= 0的, deadline不可能小于0吧,因为java是有符号数,所以如果偏移量过大的情况下,是会变成负数的,所以这里做个校验
             if (delay > 0 && deadline < 0) {
                 deadline = Long.MAX_VALUE;
             }
             //将TimerTask包装成HashedWheelTimerout(时间轮的定时任务基本单位)
             HashedWheelTimeout timeout = new HashedWheelTimeout(this, task, deadline);
             //添加到timeouts的缓存队列中,随后再真的放入到时间轮中去执行
-            timeouts.add(timeout);
+            timeoutsCache.add(timeout);
+            //放入到业务event的缓存中
             this.dataIndexMap.put(task.getId(), task.getId());
             return timeout;
         }

@@ -51,7 +51,7 @@ public class HashedWheelTimeout implements Timeout {
     private final TimerTask task;
 
     /**
-     * 功能：到期时间
+     * dealline的含义是执行时间距离时间轮startTime的偏移时间
      */
     public final long deadline;
 
@@ -77,6 +77,13 @@ public class HashedWheelTimeout implements Timeout {
      */
     HashedWheelBucket bucket;
 
+    /**
+     * 构造函数
+     *
+     * @param timer    对应的时间轮
+     * @param task     真正的任务
+     * @param deadline 执行时间距离时间轮启动时间的偏移
+     */
     HashedWheelTimeout(HashedWheelTimer timer, TimerTask task, long deadline) {
         this.timer = timer;
         this.task = task;
@@ -137,7 +144,7 @@ public class HashedWheelTimeout implements Timeout {
             return;
         }
         try {
-            //功能删除索引信息
+            //业务缓存中删除,并且执行该任务
             this.timer.getDataIndexMap().remove(task.getId());
             task.run(this);
         } catch (Throwable t) {
