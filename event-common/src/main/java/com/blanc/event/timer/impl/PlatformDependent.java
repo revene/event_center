@@ -87,15 +87,14 @@ public final class PlatformDependent {
         return new MpscUnboundedArrayQueue<T>(CHUNK_SIZE);
     }
 
-
     /**
-     * 功能：转换成2^n 数据
-     *
-     * @param ticksPerWheel
-     * @return
+     * 转换成2^n 数据
+     * @param ticksPerWheel 时间轮的总格子数量
+     * @return 应该的格子数量:是2^n
      */
     public static int normalizeTicksPerWheel(int ticksPerWheel) {
         int normalizedTicksPerWheel = 1;
+        // *2 直到操作到刚好 > ticksPerWheel的第一个2^n的数
         while (normalizedTicksPerWheel < ticksPerWheel) {
             normalizedTicksPerWheel <<= 1;
         }

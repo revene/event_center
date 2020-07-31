@@ -19,9 +19,8 @@ import com.blanc.event.timer.Timeout;
 import com.blanc.event.timer.Timer;
 import com.blanc.event.timer.TimerTask;
 import com.google.common.base.Throwables;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Queue;
 import java.util.Set;
@@ -34,17 +33,18 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * @author wangbaoliang
  */
+@Data
 @Slf4j(topic = "timer")
 public class HashedWheelTimer implements Timer {
 
 
     /**
-     * 功能：全局可以定义最大实例的个数
+     * 全局可以定义最大时间轮的个数
      */
     private static final int INSTANCE_COUNT_LIMIT = 64;
 
     /**
-     * 功能：具体实例个数的计数器
+     * 当前时间轮的个数计数器
      */
     private static final AtomicInteger INSTANCE_COUNTER = new AtomicInteger();
 
@@ -56,7 +56,7 @@ public class HashedWheelTimer implements Timer {
     /**
      * 功能：调度器
      */
-    private final DispatchWorker worker = new DispatchWorker(this);
+    private final DispatchWorker dispatchWorker = new DispatchWorker(this);
 
     /**
      * 时间轮的基本时间跨度:描述了时间轮时间控制的精度
@@ -64,7 +64,7 @@ public class HashedWheelTimer implements Timer {
     private final long tickDuration;
 
     /**
-     * 功能：bucketList索引边界
+     * bucketList的最大索引,比如bucketList的length是10,则bucketIndexMask是9
      */
     private final int bucketIndexMask;
 
@@ -99,7 +99,7 @@ public class HashedWheelTimer implements Timer {
     public final AtomicLong pendingTimeouts = new AtomicLong(0);
 
     /**
-     * 功能：队列最大等待格式
+     * timeout队列缓存的最大容纳HashedWheelTimerout的数量
      */
     private final long maxPendingTimeouts;
 
@@ -109,7 +109,7 @@ public class HashedWheelTimer implements Timer {
     private volatile long startTime;
 
     /**
-     * 默认的bucket的个数 即一个时间轮有多少个格子，这里默认是512格，需要是2的n次方，用于确保hash运算的方便
+     * 默认的bucket的个数 即一个时间轮有多少个格子，这里默认是512格，需要是2的n次方，用于确保>>运算的方便
      */
     private static final int DEFAULT_BUCKET_SIZE = 512;
 
@@ -119,7 +119,7 @@ public class HashedWheelTimer implements Timer {
     private static final int MAX_BUCKET_SIZE = 1073741824;
 
     /**
-     * 功能：1ns时间常量的定义
+     * 1毫秒ms对应的纳秒ns数
      */
     private static final long MILLISECOND_NANOS = TimeUnit.MILLISECONDS.toNanos(1);
 
@@ -130,32 +130,11 @@ public class HashedWheelTimer implements Timer {
         this(Executors.defaultThreadFactory());
     }
 
-    /**
-     * 使用默认的线程池和制定的事件间隔来构造一个时间轮
-     *
-     * @param tickDuration
-     * @param unit
-     */
-    public HashedWheelTimer(long tickDuration, TimeUnit unit) {
-        this(Executors.defaultThreadFactory(), tickDuration, unit);
-    }
 
     /**
-     * 使用默认的线程池和制定的事件间隔来构造一个时间轮
+     * 功能：执行线程池 按照100ms一个格子来构造时间轮
      *
-     * @param tickDuration  时间轮的间隔
-     * @param unit          时间轮的时间单位
-     * @param ticksPerWheel 时间片的个数
-     */
-    public HashedWheelTimer(long tickDuration, TimeUnit unit, int ticksPerWheel) {
-        this(Executors.defaultThreadFactory(), tickDuration, unit, ticksPerWheel);
-    }
-
-
-    /**
-     * 功能：执行线程池 按照100ms来构造时间轮
-     *
-     * @param threadFactory
+     * @param threadFactory 线程工厂
      */
     public HashedWheelTimer(ThreadFactory threadFactory) {
         this(threadFactory, 100, TimeUnit.MILLISECONDS);
@@ -165,9 +144,9 @@ public class HashedWheelTimer implements Timer {
     /**
      * 功能：根据线程池和时间间隔来创建时间轮
      *
-     * @param threadFactory
-     * @param tickDuration
-     * @param unit
+     * @param threadFactory 线程工厂
+     * @param tickDuration  时间轮时间精度
+     * @param unit          时间轮时间精度单位
      */
     public HashedWheelTimer(ThreadFactory threadFactory, long tickDuration, TimeUnit unit) {
         this(threadFactory, tickDuration, unit, DEFAULT_BUCKET_SIZE);
@@ -176,10 +155,11 @@ public class HashedWheelTimer implements Timer {
 
     /***
      * 功能：通过线程工程和时间间隔已经时间轮的格数来创建时间轮
-     * @param threadFactory
-     * @param tickDuration
-     * @param unit
-     * @param ticksPerWheel
+     *
+     * @param threadFactory 线程工厂
+     * @param tickDuration  时间轮时间精度
+     * @param unit          时间轮时间精度单位
+     * @param ticksPerWheel 时间轮期望的格子数(实际取最小的大于ticksPerWheel的2^n数)
      */
     public HashedWheelTimer(ThreadFactory threadFactory, long tickDuration, TimeUnit unit, int ticksPerWheel) {
         this(threadFactory, tickDuration, unit, ticksPerWheel, -1);
@@ -189,10 +169,10 @@ public class HashedWheelTimer implements Timer {
     /**
      * 功能：检验构造方法的入参情况
      *
-     * @param threadFactory
-     * @param tickDuration
-     * @param unit
-     * @param ticksPerWheel
+     * @param threadFactory 构造线程的线程工厂类
+     * @param tickDuration  时间轮的时间精度:每一格的时间
+     * @param unit          时间轮的时间精度单位
+     * @param ticksPerWheel 期望的时间轮格数
      */
     private void checkPram(ThreadFactory threadFactory, long tickDuration, TimeUnit unit, int ticksPerWheel) {
         if (threadFactory == null) {
@@ -212,27 +192,29 @@ public class HashedWheelTimer implements Timer {
     /**
      * 功能：最终构造方法
      *
-     * @param threadFactory
-     * @param tickDuration
-     * @param unit
-     * @param ticksPerWheel
+     * @param threadFactory      构造线程的线程工厂
+     * @param tickDuration       时间轮每一格的时间,即控制的时间单位精度
+     * @param unit               每一格时间的精度
+     * @param ticksPerWheel      期望的时间轮格子数
      * @param maxPendingTimeouts The maximum number of pending timeouts after which call to
      */
     public HashedWheelTimer(ThreadFactory threadFactory, long tickDuration, TimeUnit unit, int ticksPerWheel, long maxPendingTimeouts) {
         //检验参数
         checkPram(threadFactory, tickDuration, unit, ticksPerWheel);
+        //创建ticksPerWheel个桶数组,实际上是比ticksPerWheel大的最小的2^n个桶数组,因为计算任务应该在哪个格子的时候,2^n可以通过>>达到%的效果,且效果更好
         bucketList = createWheel(ticksPerWheel);
         bucketIndexMask = bucketList.length - 1;
 
-        // 讲间隔时间转换成NS
+        //将时间格的时间转换成纳秒
         long duration = unit.toNanos(tickDuration);
 
-        // Prevent overflow.
+        //计算Long值情况下,允许的最大的时间格精度时间,如果超过则报错
         long maxDuration = Long.MAX_VALUE / bucketList.length;
         if (duration >= maxDuration) {
-            String error = String.format("tickDuration: %d (expected: 0 < tickDuration in nanos < %d", tickDuration, maxDuration);
-            throw new IllegalArgumentException();
+            String error = String.format("tickDuration : %d is out of range, (expected: 0 < tickDuration in nanos < %d", tickDuration, maxDuration);
+            throw new IllegalArgumentException(error);
         }
+        // 不能小于最小精度1ms,不然设置成1ms,这个地方应该没啥用,因为传入的tickDuration本身就是MILLISECOND_NANOS的整数倍
         if (duration < MILLISECOND_NANOS) {
             this.tickDuration = MILLISECOND_NANOS;
         } else {
@@ -240,10 +222,11 @@ public class HashedWheelTimer implements Timer {
         }
 
         //构造监控线程
-        workerThread = threadFactory.newThread(worker);
+        workerThread = threadFactory.newThread(dispatchWorker);
 
         this.maxPendingTimeouts = maxPendingTimeouts;
 
+        //时间轮不能超过最大的实例个数,64个
         if (INSTANCE_COUNTER.incrementAndGet() > INSTANCE_COUNT_LIMIT) {
             reportTooManyInstances();
         }
@@ -259,10 +242,10 @@ public class HashedWheelTimer implements Timer {
     }
 
     /**
-     * 功能：创建时间轮数字
+     * 创建时间轮格子数对应的HashedWheelBucket数组
      *
-     * @param bucketSize
-     * @return
+     * @param bucketSize 希望的时间隔格数
+     * @return HashedWheelBucket数组
      */
     private HashedWheelBucket[] createWheel(int bucketSize) {
         if (bucketSize > MAX_BUCKET_SIZE) {
@@ -281,10 +264,10 @@ public class HashedWheelTimer implements Timer {
      * 功能：启动线程
      */
     public void start() {
-        //当没有启动尝试启动
-        if (!this.worker.isStart()) {
+        //尝试启动调度线程
+        if (!this.dispatchWorker.isStart()) {
             synchronized (this) {
-                this.worker.start();
+                this.dispatchWorker.start();
                 workerThread.start();
             }
         }
@@ -310,10 +293,10 @@ public class HashedWheelTimer implements Timer {
             throw new IllegalStateException(".stop() cannot be called from " + TimerTask.class.getSimpleName());
         }
 
-        if (!this.worker.stop()) {
+        if (!this.dispatchWorker.stop()) {
             INSTANCE_COUNTER.decrementAndGet();
         } else {
-            return worker.unprocessedTimeouts();
+            return dispatchWorker.unprocessedTimeouts();
         }
         try {
             boolean interrupted = false;
@@ -331,7 +314,7 @@ public class HashedWheelTimer implements Timer {
         } finally {
             INSTANCE_COUNTER.decrementAndGet();
         }
-        return worker.unprocessedTimeouts();
+        return dispatchWorker.unprocessedTimeouts();
     }
 
 
@@ -339,9 +322,8 @@ public class HashedWheelTimer implements Timer {
     public Timeout newTimeout(TimerTask task, long delay, TimeUnit unit) {
         //当缓存中不包含任务的时间才添加 Key是event的主键id
         if (!this.getDataIndexMap().containsKey(task.getId())) {
-            //计数器，没在时间轮中添加一个事件就将count+1;
+            //timerout缓存队列计数器 + 1, 不能 > 限定的最大的数量
             long pendingTimeoutsCount = pendingTimeouts.incrementAndGet();
-            //todo 这个pendingTimeOuts是个啥意思?
             if (maxPendingTimeouts > 0 && pendingTimeoutsCount > maxPendingTimeouts) {
                 pendingTimeouts.decrementAndGet();
                 throw new RejectedExecutionException("Number of pending timeouts ("
@@ -367,14 +349,8 @@ public class HashedWheelTimer implements Timer {
     }
 
     /**
-     * 功能：获取到等待队列
-     *
-     * @return
+     * 日志记录创建了超过允许个数的时间轮
      */
-    public long pendingTimeouts() {
-        return pendingTimeouts.get();
-    }
-
     private static void reportTooManyInstances() {
         String resourceType = PlatformDependent.simpleClassName(HashedWheelTimer.class);
         log.error("You are creating too many " + resourceType + " instances. " +
@@ -383,49 +359,4 @@ public class HashedWheelTimer implements Timer {
 
     }
 
-
-    public long getTickDuration() {
-        return tickDuration;
-    }
-
-    public int getBucketIndexMask() {
-        return bucketIndexMask;
-    }
-
-
-    public CountDownLatch getTimerInitialLock() {
-        return timerInitialLock;
-    }
-
-    public Queue<HashedWheelTimeout> getTimeouts() {
-        return timeouts;
-    }
-
-    public Queue<HashedWheelTimeout> getCancelledTimeouts() {
-        return cancelledTimeouts;
-    }
-
-    public AtomicLong getPendingTimeouts() {
-        return pendingTimeouts;
-    }
-
-    public long getMaxPendingTimeouts() {
-        return maxPendingTimeouts;
-    }
-
-    public long getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(long startTime) {
-        this.startTime = startTime;
-    }
-
-    public HashedWheelBucket[] getBucketList() {
-        return bucketList;
-    }
-
-    public ConcurrentHashMap<String, String> getDataIndexMap() {
-        return dataIndexMap;
-    }
 }
