@@ -1,8 +1,6 @@
 package com.blanc.event.manager.impl;
 
 import com.blanc.event.dao.EventTypeDao;
-import com.blanc.event.error.ExceptionConstant;
-import com.blanc.event.error.ExceptionUtil;
 import com.blanc.event.manager.EventManager;
 import com.blanc.event.manager.EventTypeManager;
 import com.blanc.event.model.*;
@@ -77,17 +75,12 @@ public class EventTypeManagerImpl implements EventTypeManager {
         Result<Boolean> result = new Result<>();
         try {
             //检测输入信息是是否正确
-//            ExceptionInfo exceptionCode = checkParam(eventType);
-//            if (exceptionCode != ExceptionConstant.OK) {
-//                ExceptionUtil.setException(result, exceptionCode);
-//                return result;
-//            }
             String appCode = eventType.getAppCode();
             String type = eventType.getEventType();
             //判断下是否已经存在
             EventType exist = eventTypeDao.getEventType(appCode, type, null);
             if (exist != null) {
-                ExceptionUtil.setException(result, ExceptionConstant.EVENT_TYPE_IS_EXIST);
+                result.fail("事件类型已经存在");
             } else {
                 eventTypeDao.insert(eventType);
                 result.success();

@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @author chuchengyi
+ *
  */
 @Component
 public class ConsumerServiceFactory {
@@ -74,8 +74,6 @@ public class ConsumerServiceFactory {
         } catch (Throwable throwable) {
             logger.error("ConsumerServiceRegisterFactory[registerService] is error:", throwable);
         }
-
-
     }
 
 

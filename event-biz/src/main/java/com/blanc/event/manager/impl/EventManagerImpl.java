@@ -3,8 +3,6 @@ package com.blanc.event.manager.impl;
 import com.alibaba.fastjson.JSON;
 import com.blanc.event.cache.EventTypeCache;
 import com.blanc.event.dao.EventDao;
-import com.blanc.event.error.ExceptionConstant;
-import com.blanc.event.error.ExceptionUtil;
 import com.blanc.event.manager.EventManager;
 import com.blanc.event.model.*;
 import com.google.common.base.Throwables;
@@ -40,16 +38,10 @@ public class EventManagerImpl implements EventManager {
         Result<Long> result = new Result();
         try {
             //检测输入信息是是否正确
-//            ExceptionInfo exceptionCode = checkParam(event);
-//            if (exceptionCode != ExceptionConstant.OK) {
-//                ExceptionUtil.setException(result, exceptionCode);
-//                return result;
-//            }
             //获取到事件类型
             EventType eventType = EventTypeCache.getInstance().getEventType(event);
             if (eventType == null) {
-                result.fail(ExceptionConstant.EVENT_TYPE_IS_NOT_EXIST.getExceptionMessage());
-                ExceptionUtil.setException(result, ExceptionConstant.EVENT_TYPE_IS_NOT_EXIST);
+                result.fail("事件类型不存在");
                 return result;
             }
 

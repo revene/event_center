@@ -22,7 +22,6 @@ public class ConsumerServiceInitTask implements ApplicationListener<ContextRefre
     @Resource
     private EventExecuteService eventExecuteService;
 
-
     /**
      * 功能：30s刷新一次
      */

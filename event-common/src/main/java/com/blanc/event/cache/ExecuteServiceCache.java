@@ -13,13 +13,15 @@ public class ExecuteServiceCache {
 
     private static final String KEY_LINK = "_";
 
+    /**
+     * 单例
+     */
     private static final ExecuteServiceCache INSTANCE = new ExecuteServiceCache();
 
     /**
      * 功能：服务列表信息
      */
     private Map<String, ReferenceConfig> serviceMap = new ConcurrentHashMap<>();
-
 
     /**
      * 功能：定时调用的服务列表

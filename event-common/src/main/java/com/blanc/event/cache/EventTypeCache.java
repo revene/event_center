@@ -7,15 +7,12 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 功能：获取事件类型缓存
- *
- * @author chuchengyi
+ * eventType的缓存
  */
 public class EventTypeCache {
 
-
     /**
-     * 功能：单利模式来构造缓存信息
+     * 单例
      */
     private static final EventTypeCache INSTANCE = new EventTypeCache();
 
@@ -24,11 +21,9 @@ public class EventTypeCache {
      */
     private Map<String, Map<String, EventType>> eventTypeMap = new ConcurrentHashMap<>();
 
-
     private EventTypeCache() {
 
     }
-
 
     /**
      * 功能：获取缓存的的实例对象
@@ -39,13 +34,12 @@ public class EventTypeCache {
         return INSTANCE;
     }
 
-
     /**
      * 功能：更加应用标识和事件类型标识来获取事件类型信息 不存在的是否返回为空
      *
-     * @param appCode
-     * @param eventTypeCode
-     * @return
+     * @param appCode       应用code
+     * @param eventTypeCode event_type
+     * @return eventType实体
      */
     public EventType getEventType(String appCode, String eventTypeCode) {
         //判断缓存中是否已经存在应用类型
@@ -64,8 +58,8 @@ public class EventTypeCache {
     /**
      * 功能：根据事件来获取事件类型
      *
-     * @param event
-     * @return
+     * @param event 事件
+     * @return eventType
      */
     public EventType getEventType(Event event) {
         return this.getEventType(event.getAppCode(), event.getEventType());
@@ -75,13 +69,14 @@ public class EventTypeCache {
     /**
      * 功能：添加事件类型
      *
-     * @param eventType
+     * @param eventType 事件类型
      */
     public void addEventType(EventType eventType) {
         //获取应用标识
         String appCode = eventType.getAppCode();
         //获取事件类型标识
         String typeCode = eventType.getEventType();
+        //加锁是因为其中包含了if等竞态条件,会出现并发问题
         synchronized (this.eventTypeMap) {
             //判断事件类型是否已经存在
             if (eventTypeMap.containsKey(appCode)) {
@@ -92,10 +87,7 @@ public class EventTypeCache {
                 Map<String, EventType> map = new ConcurrentHashMap<>(32);
                 map.put(typeCode, eventType);
                 this.eventTypeMap.put(appCode, map);
-
             }
         }
-
-
     }
 }

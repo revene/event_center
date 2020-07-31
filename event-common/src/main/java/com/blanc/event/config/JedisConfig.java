@@ -1,5 +1,6 @@
 package com.blanc.event.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,16 +12,13 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 /**
- * @author chuchengyi
+ * redis连接池配置
+ *
+ * @author wangbaoliang
  */
+@Slf4j(topic = "configLog")
 @Configuration
 public class JedisConfig extends CachingConfigurerSupport {
-
-    /**
-     * 功能：定义日志信息
-     */
-    private final static Logger logger = LoggerFactory.getLogger("eventLog");
-
 
     @Value("${spring.redis.host}")
     private String host;
@@ -46,21 +44,18 @@ public class JedisConfig extends CachingConfigurerSupport {
     @Value("${spring.redis.pool.max-wait}")
     private long maxWaitMillis;
 
-
-
-
     @Bean("jedisPool")
     public JedisPool redisPoolFactory() {
         JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
-        jedisPoolConfig.setMaxIdle(maxIdle);jedisPoolConfig.setMaxTotal(maxActive);
+        jedisPoolConfig.setMaxIdle(maxIdle);
+        jedisPoolConfig.setMaxTotal(maxActive);
         jedisPoolConfig.setMinIdle(minIdle);
         jedisPoolConfig.setMaxWaitMillis(maxWaitMillis);
         if (StringUtils.isEmpty(password)) {
             password = null;
         }
         JedisPool jedisPool = new JedisPool(jedisPoolConfig, host, port, timeout, password);
-
-        logger.info("JedisPool注入成功！ redis地址：" + host + ":" + port);
+        log.info("JedisPool注入成功！ redis地址：" + host + ":" + port);
         return jedisPool;
     }
 

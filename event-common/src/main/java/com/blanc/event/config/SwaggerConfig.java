@@ -13,7 +13,9 @@ import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
- * @author chuchengyi
+ * swagger的配置
+ *
+ * @author wangbaoliang
  */
 @Configuration
 @EnableSwagger2
@@ -35,9 +37,9 @@ public class SwaggerConfig {
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 .title("EVENT_CENTER系统接口文档")
-                .description("谊品生鲜事件中心系统")
+                .description("事件中心系统")
                 .version("1.0")
-                .contact(new Contact("ydx", null, null))
+                .contact(new Contact("blanc", null, "mattwangzero@gmail.com"))
                 .build();
     }
 

@@ -13,32 +13,25 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
- * 功能：事件类型本地缓存同步任务
- *
- * @author chuchengyi
+ * 事件类型event_type同步本地缓存定时任务
  */
 @Component
 public class EventTypeCacheRefreshTask implements ApplicationListener<ContextRefreshedEvent> {
 
-
     /**
-     * 功能：定义事件类型缓存的刷新时长
+     * cron表达式,6分钟刷新一次
      */
-
     private static final String SCHEDULED_CRON = "0 0/6 * * * ?";
-
 
     @Resource
     private EventTypeManager eventTypeManager;
 
     /**
-     * 功能：定时刷新事件类型信息
-     *
-     * @return
+     * 定时任务加载本地缓存
      */
     @Scheduled(cron = SCHEDULED_CRON)
-    public Result<List<EventType>> cacheUpdate() {
-        //获取事件类型信息
+    public void cacheUpdate() {
+        //获取所有的事件类型信息
         Result<List<EventType>> result = eventTypeManager.listAll();
         if (result.isSuccess()) {
             //获取数据列表信息
@@ -48,23 +41,18 @@ public class EventTypeCacheRefreshTask implements ApplicationListener<ContextRef
                 EventTypeCache.getInstance().addEventType(eventType);
             }
         }
-        return result;
     }
 
     /**
-     * 功能：容器启动的时候自动执行
+     * 容器初始化完毕后开始执行
      *
-     * @param event
+     * @param event applicationContext初始化事件
      */
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         //web容器加载的时候才执行
         if (event.getApplicationContext().getParent() == null) {
-            //执行缓存
-            Result<List<EventType>> result = cacheUpdate();
-            if (!result.isSuccess()) {
-                throw new RuntimeException("EventTypeCacheRefreshTask is error" + result);
-            }
+            cacheUpdate();
         }
     }
 }
