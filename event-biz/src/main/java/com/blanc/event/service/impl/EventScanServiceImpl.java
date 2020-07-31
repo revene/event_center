@@ -10,7 +10,7 @@ import com.blanc.event.model.Result;
 import com.blanc.event.service.EventScanService;
 import com.blanc.event.timer.Timer;
 import com.blanc.event.timer.impl.HashedWheelTimer;
-import com.blanc.event.worker.EventTaskListener;
+import com.blanc.event.worker.EventTaskExecutor;
 import com.blanc.event.worker.EventTimerTask;
 import com.blanc.event.worker.EventScanWorker;
 import lombok.extern.slf4j.Slf4j;
@@ -60,7 +60,7 @@ public class EventScanServiceImpl implements EventScanService {
     @Autowired
     private EventScanNodeManager eventScanNodeManager;
     @Autowired
-    private EventTaskListener eventTaskListener;
+    private EventTaskExecutor eventTaskListener;
 
     /**
      * 工作节点对应的工作线程
@@ -108,7 +108,7 @@ public class EventScanServiceImpl implements EventScanService {
             }
             task.setEvent(event);
             //设置事件监听的处理器，其中包括execute方法
-            task.setTaskListener(this.eventTaskListener);
+            task.setTaskExecutor(this.eventTaskListener);
             //将事件包装好提交到时间轮
             timer.newTimeout(task, delay, TimeUnit.MILLISECONDS);
             result.success();

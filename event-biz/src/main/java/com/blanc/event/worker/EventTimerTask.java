@@ -1,8 +1,8 @@
 package com.blanc.event.worker;
 
 import com.blanc.event.model.Event;
-import com.blanc.event.timer.AbstractTimerTask;
-import com.blanc.event.timer.TaskListener;
+import com.blanc.event.timer.TaskExecutor;
+import com.blanc.event.timer.Timeout;
 import com.blanc.event.timer.TimerTask;
 import lombok.Data;
 import lombok.ToString;
@@ -14,7 +14,7 @@ import lombok.ToString;
  */
 @Data
 @ToString
-public class EventTimerTask extends AbstractTimerTask<Event> implements TimerTask {
+public class EventTimerTask implements TimerTask<Event> {
 
     /**
      * 要执行的event
@@ -24,7 +24,12 @@ public class EventTimerTask extends AbstractTimerTask<Event> implements TimerTas
     /**
      * 功能：事件监听器
      */
-    private EventTaskListener taskListener;
+    private EventTaskExecutor taskExecutor;
+
+    @Override
+    public void run(Timeout timeout) throws Exception {
+        taskExecutor.executeTask(this);
+    }
 
     @Override
     public Event getTask() {
@@ -32,8 +37,8 @@ public class EventTimerTask extends AbstractTimerTask<Event> implements TimerTas
     }
 
     @Override
-    public TaskListener getTaskListener() {
-        return taskListener;
+    public TaskExecutor getTaskExecutor() {
+        return taskExecutor;
     }
 
     @Override

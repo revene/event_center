@@ -1,7 +1,7 @@
 package com.blanc.event.timer.test;
 
-import com.blanc.event.timer.AbstractTimerTask;
-import com.blanc.event.timer.TaskListener;
+import com.blanc.event.timer.TaskExecutor;
+import com.blanc.event.timer.Timeout;
 import com.blanc.event.timer.TimerTask;
 
 import java.util.concurrent.CountDownLatch;
@@ -9,14 +9,19 @@ import java.util.concurrent.CountDownLatch;
 /**
  * @author chuchengyi
  */
-public class TestTask extends AbstractTimerTask<String> implements TimerTask {
+public class TestTimerTask implements TimerTask {
 
 
     private String data;
 
-    TestTaskListener taskListener = new TestTaskListener();
+    TestTaskExecutor taskListener = new TestTaskExecutor();
 
     private CountDownLatch countDownLatch;
+
+    @Override
+    public void run(Timeout timeout) throws Exception {
+
+    }
 
     @Override
     public String getTask() {
@@ -24,7 +29,7 @@ public class TestTask extends AbstractTimerTask<String> implements TimerTask {
     }
 
     @Override
-    public TaskListener getTaskListener() {
+    public TaskExecutor getTaskExecutor() {
         return taskListener;
     }
 

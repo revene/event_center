@@ -17,7 +17,7 @@ package com.blanc.event.timer;
 
 
 /**
- * 执行事件的包装类
+ * 时间轮: TimerTask任务的包装类
  *
  * @param <T>
  */
@@ -39,13 +39,12 @@ public interface TimerTask<T> {
      */
     T getTask();
 
-
     /**
-     * 功能：获取到具体的事件监听器
+     * 获取任务的执行器
      *
-     * @return taskListener
+     * @return 任务执行器
      */
-    TaskListener getTaskListener();
+    TaskExecutor getTaskExecutor();
 
 
     /**

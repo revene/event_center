@@ -20,7 +20,7 @@ public class Test {
 
             final CountDownLatch latch = new CountDownLatch(SIZE);
             for (int i = 0; i < SIZE; i++) {
-                TestTask task = new TestTask();
+                TestTimerTask task = new TestTimerTask();
                 task.setData(i + "");
                 task.setCountDownLatch(latch);
                 timer.newTimeout(task, i % 5, TimeUnit.SECONDS);

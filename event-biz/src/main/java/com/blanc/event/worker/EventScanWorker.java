@@ -60,7 +60,7 @@ public class EventScanWorker implements Runnable {
     /**
      * 功能：事件处理器
      */
-    private EventTaskListener eventTaskListener;
+    private EventTaskExecutor eventTaskListener;
 
     /**
      * 功能：事件扫描服务
