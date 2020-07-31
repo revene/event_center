@@ -59,7 +59,6 @@ public class EventScanController {
                     tableIndex);
         }
         return result;
-
     }
 
 }
