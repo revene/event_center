@@ -1,6 +1,5 @@
 package com.blanc.event.service.register;
 
-import com.alibaba.dubbo.config.ReferenceConfig;
 import com.blanc.event.cache.EventTypeCache;
 import com.blanc.event.cache.ExecuteServiceCache;
 import com.blanc.event.model.Event;
@@ -8,6 +7,7 @@ import com.blanc.event.model.EventType;
 import com.blanc.event.sevice.ConsumerService;
 import com.blanc.event.sevice.EventConsumerService;
 import com.blanc.event.sevice.EventScheduleConsumerService;
+import org.apache.dubbo.config.ReferenceConfigBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,7 +107,7 @@ public class ConsumerServiceFactory {
      */
     private EventConsumerService getNormalService(String app, String targetIp) {
         EventConsumerService service = null;
-        ReferenceConfig<EventConsumerService> reference = null;
+        ReferenceConfigBase<EventConsumerService> reference = null;
         //当IP没有的时候调用普通服务
         if (StringUtils.isEmpty(targetIp)) {
             reference = executeServiceCache.getService(app);
@@ -137,7 +137,7 @@ public class ConsumerServiceFactory {
      */
     private EventScheduleConsumerService getScheduleService(String app, String targetIp) {
         EventScheduleConsumerService service = null;
-        ReferenceConfig<EventScheduleConsumerService> reference = null;
+        ReferenceConfigBase<EventScheduleConsumerService> reference = null;
         if (StringUtils.isEmpty(targetIp)) {
             reference = executeServiceCache.getScheduleService(app);
 

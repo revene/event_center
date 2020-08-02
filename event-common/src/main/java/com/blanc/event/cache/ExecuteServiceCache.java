@@ -1,6 +1,7 @@
 package com.blanc.event.cache;
 
 import com.alibaba.dubbo.config.ReferenceConfig;
+import org.apache.dubbo.config.ReferenceConfigBase;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,23 +22,23 @@ public class ExecuteServiceCache {
     /**
      * 功能：服务列表信息
      */
-    private Map<String, ReferenceConfig> serviceMap = new ConcurrentHashMap<>();
+    private Map<String, ReferenceConfigBase> serviceMap = new ConcurrentHashMap<>();
 
     /**
      * 功能：定时调用的服务列表
      */
-    private Map<String, ReferenceConfig> scheduleServiceMap = new ConcurrentHashMap<>();
+    private Map<String, ReferenceConfigBase> scheduleServiceMap = new ConcurrentHashMap<>();
 
     /**
      * 功能:直接调用的服务列表 key=app+ip
      */
-    private Map<String, ReferenceConfig> directServiceMap = new ConcurrentHashMap<>();
+    private Map<String, ReferenceConfigBase> directServiceMap = new ConcurrentHashMap<>();
 
 
     /**
      * 功能:直接调用定时服务的服务列表 key=app+ip
      */
-    private Map<String, ReferenceConfig> scheduleDirectServiceMap = new ConcurrentHashMap<>();
+    private Map<String, ReferenceConfigBase> scheduleDirectServiceMap = new ConcurrentHashMap<>();
 
     private ExecuteServiceCache() {
 
@@ -118,7 +119,7 @@ public class ExecuteServiceCache {
      * @param app
      * @return
      */
-    public ReferenceConfig getService(String app) {
+    public ReferenceConfigBase getService(String app) {
         return serviceMap.get(app);
     }
 
@@ -129,7 +130,7 @@ public class ExecuteServiceCache {
      * @param app
      * @return
      */
-    public ReferenceConfig getScheduleService(String app) {
+    public ReferenceConfigBase getScheduleService(String app) {
         return scheduleServiceMap.get(app);
     }
 
@@ -140,7 +141,7 @@ public class ExecuteServiceCache {
      * @param targetIp
      * @return
      */
-    public ReferenceConfig getDirectService(String app, String targetIp) {
+    public ReferenceConfigBase getDirectService(String app, String targetIp) {
         String key = genDirectKey(app, targetIp);
         return directServiceMap.get(key);
     }
@@ -179,7 +180,7 @@ public class ExecuteServiceCache {
      * @param targetIp
      * @return
      */
-    public ReferenceConfig getDirectScheduleService(String app, String targetIp) {
+    public ReferenceConfigBase getDirectScheduleService(String app, String targetIp) {
         String key = genDirectKey(app, targetIp);
         return scheduleDirectServiceMap.get(key);
     }
